@@ -2,9 +2,9 @@ from flask import Flask, render_template, redirect, session, request, jsonify
 import json
 from dotenv.main import load_dotenv
 from flask_session import Session
+from sqlalchemy import text
 import os
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import or_
 from flask_cors import CORS
 import random
 import string
@@ -49,6 +49,14 @@ def home():
 def requestMechanics():
     return render_template('user/request.html')
 
+@app.route('/view-mechanics', methods=['GET','POST'])
+def viewMechanical():
+    return render_template('mechanics/view-mechanics.html')
+
+@app.route('/user-login', methods=['GET'])
+def authentication():
+    return render_template('login.html')
+
 @app.route('/login',methods=['GET','POST'])
 def login():
     if request.method=='POST' and session.get("uid")==None:
@@ -57,9 +65,7 @@ def login():
         password = data["password"]
         print("username: ",username)
         print("password: ",password)
-        query = """
-        SELECT * from users WHERE uid = :uid
-        """
+        query = text("SELECT * from users WHERE uid=:uid")
         row = db.session.execute(query,{'uid':username}).first()
         if row is not None:
             salt = row.salt
@@ -77,7 +83,7 @@ def login():
                 user_data = {
                         "uid": row.username,
                         "role": row.role,
-                        "username": row.name,
+                        "username": row.username,
                         "phone": row.phone,
                         "address":row.address
                 }
