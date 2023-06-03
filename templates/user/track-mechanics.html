@@ -11,6 +11,60 @@
 </main>
 
 <script>
+    function TrackFunction() {
+    if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(updateLocation, handleLocationError);
+    }
+            // Add your function logic here
+    }
+    function updateLocation(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            var newdata = {
+              latitude : latitude,
+              longitude : longitude
+            }
+            $.ajax({
+                type: 'POST',
+                url: '/updateMechanicLocation', // Replace with your Flask API endpoint
+                data: JSON.stringify(newdata),
+                contentType: 'application/json',
+                success: function(response) {
+                    console.log('Data sent successfully!');
+                    console.log(response);
+                    if (!response.status){
+                      TrackFunction();
+                    }
+                    else{
+                      console.log('Task Completed');
+                    }
+                    
+                },
+                error: function(error) {
+                    console.log('An error occurred while sending the image.');
+                    console.log(error);
+                }
+            });
+      // document.getElementById('result').textContent = base64String;
+        }
+        
+        function handleLocationError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    document.getElementById('location').textContent = 'User denied the request for Geolocation.';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    document.getElementById('location').textContent = 'Location information is unavailable.';
+                    break;
+                case error.TIMEOUT:
+                    document.getElementById('location').textContent = 'The request to get user location timed out.';
+                    break;
+                case error.UNKNOWN_ERROR:
+                    document.getElementById('location').textContent = 'An unknown error occurred.';
+                    break;
+            }
+        }
+  window.onload = TrackFunction;
   function areLocationsSame(lat1, lon1, lat2, lon2, errorThreshold) {
     var R = 6371; // Radius of the Earth in kilometers
     var lat1Rad = degToRad(lat1);

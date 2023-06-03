@@ -345,6 +345,7 @@ def acceptRequest():
         db.session.commit()
 
         session['req_id'] = req_id
+        session['status'] = 1
 
         return json.dumps({"mssg":200})
     
@@ -441,6 +442,7 @@ def assignedRequests():
             d['user_longitude'] = str(req.user_longitude)
             d["timestamp"] = req.timestamp_.strftime("%Y-%m-%d %H:%M:%S")
             session['req_id'] = req.request_id
+            session['status'] = 1
             req_list.append(d)
 
         db.session.commit()
@@ -472,6 +474,9 @@ def assignedRequests():
             db.session.execute(query,{"req_id":req_id,"mech_lat":mech_lat,"mech_long":mech_long})
             db.session.commit()
 
+            if session.get("status") is None:
+                return json.dumps({"status":2})
+
             return json.dumps({"mssg":200})
         
 @app.route('/completeRequest',methods=['GET','POST'])
@@ -490,6 +495,7 @@ def completeRequest():
         db.session.commit()
 
         session.pop("req_id")
+        session.pop("status")
 
         return json.dumps({"mssg":200})
     
