@@ -6,11 +6,34 @@
 <main id="main" style="margin: 4rem 0rem">
   <div class="container-fluid" >
     <div id="map" style="height:60vh;width: 100%;"></div>
-    <a  href="https://www.google.com/maps/dir/19.1093463,72.8858094/19.104,72.8758094/" target="_blank" class="d-flex justify-content-center"><Button>Find the Possible Routes</Button></a>
+    <a id="redirect" href="https://www.google.com/maps/dir/19.104,72.8758094/19.1093463,72.8858094/" target="_blank" class="d-flex justify-content-center"><Button>Find the Possible Routes</Button></a>
   </div>
 </main>
 
 <script>
+  function MapFunction(){
+    navigator.geolocation.getCurrentPosition(updatelink);
+  }
+  function updatelink(position){
+    fetch('https://api.example.com/data')
+  .then(function(response) {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error('Request failed');
+    }
+  })
+  .then(function(data) {
+    console.log(data);
+    var link = document.getElementById("redirect");
+    link.href = "https://www.google.com/maps/dir/"+position.coords.latitude+","+position.coords.longitude+"/"+data.user_latitude+","+data.user_longitude+"/";
+    // Process the response data here
+  })
+  .catch(function(error) {
+    console.log(error);
+  });
+    
+  }
     function TrackFunction() {
     if (navigator.geolocation) {
                 navigator.geolocation.watchPosition(updateLocation, handleLocationError);
@@ -33,16 +56,19 @@
                     console.log('Data sent successfully!');
                     console.log(response);
                     if (!response.status){
+                      setInterval(TrackFunction(), 10000);
                       TrackFunction();
                     }
                     else{
+
                       console.log('Task Completed');
                     }
                     
                 },
                 error: function(error) {
-                    console.log('An error occurred while sending the image.');
-                    console.log(error);
+                    console.log('An error occurred while sending the data.');
+                    console.log(newdata);
+                    // console.log(error);
                 }
             });
       // document.getElementById('result').textContent = base64String;
@@ -65,6 +91,7 @@
             }
         }
   window.onload = TrackFunction;
+  window.onload = MapFunction;
   function areLocationsSame(lat1, lon1, lat2, lon2, errorThreshold) {
     var R = 6371; // Radius of the Earth in kilometers
     var lat1Rad = degToRad(lat1);
