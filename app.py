@@ -59,6 +59,7 @@ def logout():
 def viewMechanical():
     return render_template('mechanics/view-mechanics.html', request=request)
 
+
 @app.route('/user-login', methods=['GET'])
 def authentication():
     return render_template('login.html', request=request)
