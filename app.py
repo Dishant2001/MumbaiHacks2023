@@ -82,6 +82,7 @@ def login():
             if hex_dig==row.password:
                 session['uid'] = row.uid
                 session['role'] = row.role
+                session['name'] = row.username
                     
                     # print("logged in")
                 print(session['uid'])
@@ -293,7 +294,7 @@ def getNearestRequest():
                     sin(radians(user_latitude))
                 )
             ) AS distance
-        FROM requests
+        FROM requests WHERE status = 0
         ORDER BY distance;
 
         """
@@ -323,7 +324,7 @@ def getNearestRequest():
     
 @app.route('/acceptRequest',methods=['GET','POST'])
 def acceptRequest():
-    if request.method=="POST" and session.get("uid") is not None and session.get("role") in ['6',6]:
+    if request.method=="POST" and session.get("uid") is not None and session.get("role") in ['6',6] and session.get("req_id") is None:
         data = request.get_json()
         mid = session.get('uid')
         req_id = data['request_id']
@@ -342,7 +343,158 @@ def acceptRequest():
 
         db.session.commit()
 
+        session['req_id'] = req_id
+
         return json.dumps({"mssg":200})
+    
+@app.route('/getShopNearestRequests',methods = ["GET","POST"])
+def getShopNearestRequests():
+    if request.method=="GET" and session.get("uid") is not None and session.get("role") in [5,'5']:
+        # data = request.get_json()
+        # mech_lat = data['latitude']
+        # mech_long = data['longitude']
+        query = """
+        SELECT address FROM users WHERE uid = :uid
+        """
+        result = db.session.execute(query,{"uid":session.get("uid")}).fetchone()
+        lat = ''
+        long = ''
+        if result:
+            address = result.address
+            lat = float(address.split('+')[0])
+            long = float(address.split('+')[1])
+
+        query2 = """
+        SELECT *, 
+            (
+                6371 * 
+                acos(
+                    cos(radians(:given_latitude)) * 
+                    cos(radians(user_latitude)) * 
+                    cos(radians(user_longitude) - radians(:given_longitude)) + 
+                    sin(radians(:given_latitude)) * 
+                    sin(radians(user_latitude))
+                )
+            ) AS distance
+        FROM requests WHERE status = 0
+        ORDER BY distance;
+
+        """
+        results = db.session.execute(query2,{
+            "given_latitude":lat,
+            "given_longitude":long,
+        })
+
+        req_list = []
+        
+        for req in results:
+            d = {}
+            d["customer"] = req.uid
+            d["car_pic"] = req.car_pic
+            d["car_name"] = req.car_name
+            d["car_brand"] = req.car_brand
+            d["request"] = req.request
+            d["request_id"] = req.request_id
+            d['user_latitude'] = str(req.user_latitude)
+            d['user_longitude'] = str(req.user_longitude)
+            d["timestamp"] = req.timestamp_.strftime("%Y-%m-%d %H:%M:%S")
+            req_list.append(d)
+
+        db.session.commit()
+
+        return json.dumps({"messg":200,"requests":req_list})
+    
+
+@app.route('/assignMechanic',methods=['GET','POST'])
+def assignMechanic():
+    if request.method=='POST' and session.get('uid') is not None and session.get("role") in ['5',5]:
+        data = request.get_json()
+        mid = data['mid']
+        req_id = data['request_id']
+        query = """
+        UPDATE requests SET mid = :mid WHERE request_id = :req_id 
+        """
+        db.session.execute(query,{"req_id":req_id})
+        db.session.commit()
+        return json.dumps({"mssg":200})
+    
+@app.route('/assignedRequests',methods=['GET',"POST"])
+def assignedRequests():
+    if request.method=="GET" and session.get("uid") is not None and session.get("role") in [6,'6']:
+        query = """
+        SELECT * from requests WHERE mid=:mid AND mech_latitude IS NULL
+        """
+        results = db.session.execute(query,{"mid":session.get("uid")})
+        
+        req_list = []
+        
+        for req in results:
+            d = {}
+            d["customer"] = req.uid
+            d["car_pic"] = req.car_pic
+            d["car_name"] = req.car_name
+            d["car_brand"] = req.car_brand
+            d["request"] = req.request
+            d["request_id"] = req.request_id
+            d['user_latitude'] = str(req.user_latitude)
+            d['user_longitude'] = str(req.user_longitude)
+            d["timestamp"] = req.timestamp_.strftime("%Y-%m-%d %H:%M:%S")
+            session['req_id'] = req.request_id
+            req_list.append(d)
+
+        db.session.commit()
+
+        return json.dumps({"messg":200,"requests":req_list})
+    
+    @app.route('/getMechLocation/<id>',methods=['GET','POST'])
+    def getMechLocation(id):
+        if request.method=="GET" and session.get("uid") is not None and session.get("role") in [4,'4']:
+            query = """
+            SELECT * from requests WHERE request_id = :req_id
+            """
+            results = db.session.execute(query,{"req_id":id}).fetchone()
+            if results:
+                latitude = results.mech_latitude
+                longitude = results.mech_longitude
+                return json.dumps({"latitude":latitude,"longitude":longitude})
+    
+    @app.route('/updateMechanicLocation',methods=['GET','POST'])
+    def updatelocation():
+        if request.method=="POST" and session.get("uid") is not None and session.get("role") in ['6',6]:
+            data = request.get_json()
+            mech_lat = data['latitude']
+            mech_long = data['longitude']
+            req_id = session.get("req_id")
+            query = """
+            UPDATE requests SET mech_latitude = :mech_lat, mech_longitude = :mech_long WHERE request_id = :req_id
+            """
+            db.session.execute(query,{"req_id":req_id,"mech_lat":mech_lat,"mech_long":mech_long})
+            db.session.commit()
+
+            return json.dumps({"mssg":200})
+        
+@app.route('/completeRequest',methods=['GET','POST'])
+def completeRequest():
+    if request.method=="POST" and session.get("uid") is not None and session.get("role") in ['6',6]:
+        mid = session.get('uid')
+        req_id = session.get("req_id")
+        query = """
+        UPDATE requests SET status = 2 WHERE request_id = :req_id;
+        """
+
+        db.session.execute(query,{
+            "req_id":req_id
+        })
+
+        db.session.commit()
+
+        session.pop("req_id")
+
+        return json.dumps({"mssg":200})
+    
+
+
+
 
 
             
