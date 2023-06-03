@@ -43,7 +43,7 @@ salt_length = 6
 
 @app.route('/',methods=['GET','POST'])
 def home():
-    return render_template('index.html')
+    return render_template('user/index.html')
 
 @app.route('/login',methods=['GET','POST'])
 def login():
@@ -96,6 +96,17 @@ def login():
     else:
         return jsonify({'mssg':'already logged in or incorrect password','name':None})
     
+
+@app.route('/getloc',methods=['GET'])
+def location():
+    import random
+    lat = random.randint(0,100)
+    lon = random.randint(0,100)
+    return jsonify({'user_longitude':lon,'user_latitude':lat,"mec_longitude":lon,'mec_latitude':lat})
+
+@app.route('/location',methods=['GET','POST'])
+def loc():
+    return render_template('user/track-mechanics.html')
 
 @app.route('/signup',methods=['GET','POST'])
 def signup():
@@ -220,4 +231,4 @@ def addmechanic():
 
 
 if __name__=="__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=8000)
