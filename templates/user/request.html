@@ -1,246 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+{% extends "base.html" %}
+{% block content %}
 
-  <title>Car Care - Home</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
-
-  <!-- Favicons -->
-  <link href="../../static/assets/img/logo.png" rel="icon">
-  <link href="../../static/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-
-  <!-- Google Fonts -->
-  <link
-    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-    rel="stylesheet">
-
-  <!-- Vendor CSS Files -->
-  <link href="../../static/assets/vendor/aos/aos.css" rel="stylesheet">
-  <link href="../../static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="../../static/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="../../static/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="../../static/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-  <link href="../../static/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="../../static/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-
-  <!-- Template Main CSS File -->
-  <link href="../../static/assets/css/style.css" rel="stylesheet">
-  <style>
-    .h3 {
-      color: #37517e;
-      text-align: center;
-      font-weight: 500;
-      font-size: 2.2rem;
-      margin: 6rem 0rem 2rem 0rem;
-    }
-
-    .btn-primary {
-      color: #fff;
-      background-color: #37517e;
-      border-radius: .2rem;
-      outline: none !important;
-      border: none !important;
-    }
-
-    .btn-primary:hover {
-      background-color: #4669a5;
-    }
-
-    .btn:focus {
-      outline: none !important;
-      box-shadow: none !important;
-
-    }
-
-    .form-control:focus {
-      box-shadow: none !important;
-      outline: none !important;
-      border: #557dc1 solid 1px !important;
-    }
-  </style>
-
-</head>
-
-<body>
-
-
-  <!-- ======= Header ======= -->
-  <header id="header" style="background-color: #37517e;" class="fixed-top ">
-    <div class="container d-flex align-items-center">
-
-      <h1 class="logo me-auto"><a href="index.html">Car Care</a></h1>
-      <!-- Uncomment below if you prefer to use an image logo -->
-      <!-- <a href="index.html" class="logo me-auto"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
-
-      <nav id="navbar" class="navbar">
-        <ul>
-          <li><a class="nav-link scrollto active" href="#hero">Home</a></li>
-          <li><a class="nav-link scrollto" href="#about">About</a></li>
-          <li><a class="nav-link scrollto" href="#services">Services</a></li>
-          <!-- <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
-            <ul>
-              <li><a href="#">Drop Down 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Drop Down</span> <i class="bi bi-chevron-right"></i></a>
-                <ul>
-                  <li><a href="#">Deep Drop Down 1</a></li>
-                  <li><a href="#">Deep Drop Down 2</a></li>
-                  <li><a href="#">Deep Drop Down 3</a></li>
-                  <li><a href="#">Deep Drop Down 4</a></li>
-                  <li><a href="#">Deep Drop Down 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Drop Down 2</a></li>
-              <li><a href="#">Drop Down 3</a></li>
-              <li><a href="#">Drop Down 4</a></li>
-            </ul>
-          </li> -->
-          <li><a class="nav-link scrollto" href="#contact">Contact</a></li>
-          <li><a class="getstarted scrollto" href="#about">Get Started</a></li>
-        </ul>
-        <i class="bi bi-list mobile-nav-toggle"></i>
-      </nav><!-- .navbar -->
-
-    </div>
-  </header><!-- End Header -->
-
-  <main id="main" style="margin: 9rem 0rem 2rem 0rem;">
-    <h3 class="h3">Request Reliable Mechanics</h3>
-    <div class="container">
-      <div class="card card-body w-50 mx-auto py-3" style="border: none;">
-        <form action="" method="post" class="px-5 mb-3" enctype="multipart/form-data">
-          <div class="mb-3">
-            <select name="fault" class="form-control" id="fault">
-              <option value="" selected hidden>Select fault</option>
-              <option value="Engine Misfires">Engine Misfires</option>
-              <option value="Overheating">Overheating</option>
-              <option value="Overheating">Electrical System Malfunctions</option>
-              <option value="Suspension and Steering Problems">Suspension and Steering Problems</option>
-              <option value="Fuel System Troubles">Fuel System Troubles</option>
-              <option value="Tyre Damage">Tyre Damage</option>
-              <option value="Tyre Rotation">Tyre Rotation</option>
-              <option value="Transmission Issues">Transmission Issues</option>
-              <option value="Brake Problems">Brake Problems</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <div class="mb-3">
-            <textarea class="form-control" name="special_instruction" id="special_instruction" rows="3"
-              placeholder="Special Instruction if any"></textarea>
-          </div>
-
-          <div class="mb-3">
-            <select name="car" id="car" class="form-control">
-              <option value="" selected hidden>Select Car</option>
-              <option value="S-Cross">S-Cross</option>
-              <option value="Baleno">Baleno</option>
-              <option value="Verna">Verna</option>
-            </select>
-          </div>
-
-          <div class="mb-3">
-            <small class="help-text">Upload Car Photo *</small>
-            <input type="file" class="form-control" name="car_photo" id="car_photo" placeholder="upload car photo">
-          </div>
-
-          <div class="mt-5 d-flex justify-content-center">
-            <button class="btn btn-primary w-100 py-2">Request</button>
-          </div>
-          <div class="my-3">
-            <p class="text-center" ><a style="color:#37517e; font-size: 1rem; font-weight: 500;" href="">skip</a></p>
-          </div>
-
-
-        </form>
-      </div>
-    </div>
-  </main>
-
-
-
-  <!-- ======= Footer ======= -->
-  <footer id="footer">
-    <div class="footer-top">
-      <div class="container">
-        <div class="row">
-
-          <div class="col-lg-3 col-md-6 footer-contact">
-            <h3>Car Care</h3>
-            <p>
-              A108 Street <br>
-              Mumbai, 400037<br>
-              India <br><br>
-              <strong>Phone:</strong> +91 9526374893<br>
-              <strong>Email:</strong> help@carcare.com<br>
-            </p>
-          </div>
-
-          <div class="col-lg-3 col-md-6 footer-links">
-            <h4>Useful Links</h4>
-            <ul>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Home</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">About us</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Services</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Terms of service</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Privacy policy</a></li>
-            </ul>
-          </div>
-
-          <div class="col-lg-3 col-md-6 footer-links">
-            <h4>Our Services</h4>
-            <ul>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Web Design</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Web Development</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Product Management</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Marketing</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Graphic Design</a></li>
-            </ul>
-          </div>
-
-          <div class="col-lg-3 col-md-6 footer-links">
-            <h4>Our Social Networks</h4>
-            <p>Cras fermentum odio eu feugiat lide par naso tierra videa magna derita valies</p>
-            <div class="social-links mt-3">
-              <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
-              <a href="#" class="facebook"><i class="bx bxl-facebook"></i></a>
-              <a href="#" class="instagram"><i class="bx bxl-instagram"></i></a>
-              <a href="#" class="google-plus"><i class="bx bxl-skype"></i></a>
-              <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
-            </div>
-          </div>
-
+<main id="main" style="margin: 9rem 0rem 2rem 0rem;">
+  <h3 class="h3">Request Reliable Mechanics</h3>
+  <div class="container">
+    <div class="card card-body w-50 mx-auto py-3" style="border: none;">
+      <form action="" method="post" class="px-5 mb-3" enctype="multipart/form-data">
+        <div class="mb-3">
+          <select name="fault" class="form-control" id="fault">
+            <option value="" selected hidden>Select fault</option>
+            <option value="Engine Misfires">Engine Misfires</option>
+            <option value="Overheating">Overheating</option>
+            <option value="Overheating">Electrical System Malfunctions</option>
+            <option value="Suspension and Steering Problems">Suspension and Steering Problems</option>
+            <option value="Fuel System Troubles">Fuel System Troubles</option>
+            <option value="Tyre Damage">Tyre Damage</option>
+            <option value="Tyre Rotation">Tyre Rotation</option>
+            <option value="Transmission Issues">Transmission Issues</option>
+            <option value="Brake Problems">Brake Problems</option>
+            <option value="Other">Other</option>
+          </select>
         </div>
-      </div>
+
+        <div class="mb-3">
+          <textarea class="form-control" name="special_instruction" id="special_instruction" rows="3"
+            placeholder="Special Instruction if any"></textarea>
+        </div>
+
+        <div class="mb-3">
+          <select name="car" id="car" class="form-control">
+            <option value="" selected hidden>Select Car</option>
+            <option value="S-Cross">S-Cross</option>
+            <option value="Baleno">Baleno</option>
+            <option value="Verna">Verna</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <small class="help-text">Upload Car Photo *</small>
+          <input type="file" class="form-control" name="car_photo" id="car_photo" placeholder="upload car photo">
+        </div>
+
+        <div class="mt-5 d-flex justify-content-center">
+          <button class="btn btn-primary w-100 py-2">Request</button>
+        </div>
+        <div class="my-3">
+          <p class="text-center" ><a style="color:#37517e; font-size: 1rem; font-weight: 500;" href="">skip</a></p>
+        </div>
+
+
+      </form>
     </div>
-
-    <div class="container footer-bottom clearfix d-flex justify-content-center">
-      <div class="copyright">
-        &copy; Copyright &nbsp;<strong><span> car care</span></strong>. All Rights Reserved
-      </div>
-    </div>
-  </footer><!-- End Footer -->
-
-  <div id="preloader"></div>
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-      class="bi bi-arrow-up-short"></i></a>
+  </div>
+</main>
 
 
-  <!-- Vendor JS Files -->
-  <script src="../../static/assets/vendor/aos/aos.js"></script>
-  <script src="../../static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="../../static/assets/vendor/glightbox/js/glightbox.min.js"></script>
-  <script src="../../static/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-  <script src="../../static/assets/vendor/swiper/swiper-bundle.min.js"></script>
-  <script src="../../static/assets/vendor/waypoints/noframework.waypoints.js"></script>
-  <script src="../../static/assets/vendor/php-email-form/validate.js"></script>
+{% endblock content %}
 
-  <!-- Template Main JS File -->
-  <script src="../../static/assets/js/main.js"></script>
 
-</body>
-
-</html>
