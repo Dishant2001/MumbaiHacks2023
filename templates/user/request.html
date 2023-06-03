@@ -99,6 +99,7 @@ function showPosition(position) {
                     // Clear the Base64 string
                     base64String = null;
                     document.getElementById('result').textContent = '';
+                    window.location.href = "/new-request";
                 },
                 error: function(error) {
                     console.log('An error occurred while sending the image.');
@@ -107,11 +108,20 @@ function showPosition(position) {
             });
       // document.getElementById('result').textContent = base64String;
   };
+
+
   
   reader.readAsDataURL(file);
 
   
 }
+
+document.getElementById("get-started").innerText = "Logout";
+
+document.getElementById("get-started").addEventListener("click",async ()=>{
+  const response = await fetch("/logout");
+  const data = await response.json();
+})
   
 </script>
 

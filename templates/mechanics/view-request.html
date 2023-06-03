@@ -11,9 +11,9 @@
         <div class="my-3">
             <div class="card card-body w-50 mx-auto">
                 <h4 class="heading text-center mb-3">Customer Details</h4>
-                <table class="table" >
+                <table class="table" id="request-table">
                     <tbody>
-                        <tr>
+                        <!-- <tr>
                             <th scope="row">Car</th>
                             <td></td>
                             <td>S-Cross</td>
@@ -33,15 +33,19 @@
                             <td></td>
                             <td><a href="" target="_blank">View</a></td>
                         </tr>
+                        <tr>
+                            <div class="my-3">
+                                <div class="d-flex justify-content-center">
+                                    <button class="btn btn-success me-3">Accept</button>
+                                    <button class="btn btn-danger">Decline</button>
+                                </div>
+                            </div>
+                        </tr> -->
+                        
                     </tbody>
                 </table>
 
-                <div class="my-3">
-                    <div class="d-flex justify-content-center">
-                        <button class="btn btn-success me-3">Accept</button>
-                        <button class="btn btn-danger">Decline</button>
-                    </div>
-                </div>
+                
 
             </div>
 
@@ -49,6 +53,88 @@
         </div>
     </div>
 </main>
+
+<script>
+    const requestTable = document.getElementById("request-table");
+
+    function getRequests(){
+
+        if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            }
+            var lat, lon;
+            async function showPosition(position) {
+                lat = position.coords.latitude
+                lon = position.coords.longitude
+                console.log(lat,lon);
+
+                const response = await fetch('/getShopNearestRequests');
+                const data = await response.json();
+
+                console.log(data);
+
+                data.requests.forEach(req => {
+                    let tbody = document.createElement("tbody");
+                    tbody.innerHTML = `
+                    <tr>
+                            <th scope="row">Car</th>
+                            <td></td>
+                            <td>${req.car_name}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Fault</th>
+                            <td></td>
+                            <td>${req.request}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Additional Info</th>
+                            <td></td>
+                            <td>Additional Info</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Car Image</th>
+                            <td></td>
+                            <td><a href="" target="_blank">View</a></td>
+                        </tr>
+                        <tr>
+                            <div class="my-3">
+                                <div class="d-flex justify-content-center">
+                                    <button class="btn btn-success me-3" id="${req.request_id}">Accept</button>
+                                    <button class="btn btn-danger">Decline</button>
+                                </div>
+                            </div>
+                        </tr>
+                    `;
+
+                    requestTable.appendChild(tbody);
+                    
+                });
+
+
+
+
+        }
+    }
+
+    document.addEventListener("click", function(event) {
+    if (event.target.nodeName === "BUTTON") {
+      const clickedButtonId = event.target.id;
+      window.localStorage.setItem("request_id",clickedButtonId);
+      window.location.href = "/view-mechanics";
+
+    }
+  });
+
+    getRequests();
+
+    document.getElementById("get-started").innerText = "Logout";
+
+document.getElementById("get-started").addEventListener("click",async ()=>{
+  const response = await fetch("/logout");
+  const data = await response.json();
+})
+
+</script>
 
 
 {% endblock content %}

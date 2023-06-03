@@ -153,11 +153,11 @@
                 .then(data => {
                     // Handle the response data
                     console.log(data['role'])
-                    if (data['role'] === 4) {
+                    if (data['role'] == 4) {
                         console.log(data['role'])
-                        window.location = "/request"
+                        window.location.href = "/new-request"
                     } else {
-                        window.location = '/'
+                        window.location.href = '/'
                     }
                 })
                 .catch(error => {
