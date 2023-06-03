@@ -46,7 +46,7 @@
           <button class="btn btn-primary w-100 py-2" type="button" onclick=requestsender()>Request</button>
         </div>
         <div class="my-3">
-          <p class="text-center" ><a style="color:#37517e; font-size: 1rem; font-weight: 500;" href="">skip</a></p>
+          <p class="text-center" ><a style="color:#37517e; font-size: 1rem; font-weight: 500;" href="{{url_for('loc_user')}}">skip</a></p>
         </div>
 
         
@@ -95,6 +95,7 @@ function showPosition(position) {
                 success: function(response) {
                     console.log('Data sent successfully!');
                     console.log(response);
+                    
                     
                     // Clear the Base64 string
                     base64String = null;

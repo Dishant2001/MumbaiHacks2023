@@ -223,9 +223,11 @@
                         console.log(data['role'])
                         if (data['role'] == 4) {
                             console.log(data['role'])
-                            window.location = "/request"
-                        } else {
-                            window.location = '/'
+                            window.location.href = "/request"
+                        }
+                        
+                        else {
+                            window.location.href = '/'
                         }
                     })
                     .catch(error => {

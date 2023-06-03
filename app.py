@@ -149,6 +149,12 @@ def location():
 def loc():
     return render_template('user/track-mechanics.html', request=request)
 
+@app.route('/location-user',methods=['GET','POST'])
+def loc_user():
+    return render_template('user/track-users.html', request=request)
+
+
+
 @app.route('/signup',methods=['GET','POST'])
 def signup():
     if request.method=='POST' and session.get('uid') is None:
@@ -242,10 +248,10 @@ def addmechanic():
         salt = ''.join(random.choices(string.ascii_uppercase + string.digits, k=salt_length))
         hex_dig = hashPassword(password,salt)
         role = 6 #mechanic
-        query = """
+        query = text("""
                 INSERT INTO users (uid, username, phone, address, role, password, salt)
                 VALUES (:uid, :name, :phone, :address, :role, :password, :salt)
-            """
+            """)
         db.session.execute(query, {
                 'uid': uid,
                 'name': name,
@@ -256,19 +262,22 @@ def addmechanic():
                 'salt': salt
             })
 
-        query2 = """
-             INSERT into mechanics(mechanic_id, shop_id, experience, specialization, rating, services) VALUES(:uid,:shop_id, :experience, :specialization, :rating, :services)
-            """
+        query2 = text("""
+            INSERT into mechanics(mechanic_id, shop_id, experience, specialization, rating, services) VALUES(:uid,:shop_id, :experience, :specialization, :rating, :services)
+            """)
         db.session.execute(query2,{
-            "uid":uid,"shop_id":session.get('username'), "experience":experience, "specialization":specialization, "rating":rating, "services":services
+            "uid":uid,"shop_id":session.get('uid'), "experience":experience, "specialization":specialization, "rating":rating, "services":services
         })
 
         db.session.commit()
-
+        print('hel,')
         mail.send_mail('mad1.21f1006594@gmail.com','lajihgnqebnnhlso', uid, uid, password, name)
 
         # redirect('/dashboard')
         return json.dumps({"mssg":200})
+        
+    else:
+        return render_template('mechanics/add-mechanical.html')
     
 
 @app.route('/request',methods=['GET','POST'])
@@ -544,7 +553,35 @@ def completeRequest():
 
         return json.dumps({"mssg":200})
     
+        
+@app.route('/customer-profile',methods=['GET','POST'])
+def customer_proflie():
+    uid = session.get('uid')
+    query = text(f"SELECT * FROM users WHERE uid='{uid}';")
+    row = db.session.execute(query).first()
+    print(row)
+    return render_template('customer_profile.html', user=row)
 
+@app.route('/shop-profile',methods=['GET','POST'])
+def shop_proflie():
+    uid = session.get('uid')
+    query = text(f"SELECT * FROM users WHERE uid='{uid}';")
+    row = db.session.execute(query).first()
+    query = text(f"SELECT * FROM mechanicshop WHERE shop_id='{uid}';")
+    row1 = db.session.execute(query).first()
+    print(row, row1)
+    return render_template('shop_profile.html',user=row, shop=row1,)
+
+@app.route('/mech-profile',methods=['GET','POST'])
+def mech_proflie():
+    uid = session.get('uid')
+    query = text(f"SELECT * FROM users WHERE uid='{uid}';")
+    row = db.session.execute(query).first()
+    query = text(f"SELECT * FROM mechanics WHERE mechanic_id='{uid}';")
+    row1 = db.session.execute(query).first()
+    query = text(f"SELECT username FROM users WHERE uid='{row1[1]}'")
+    shop = db.session.execute(query).first()
+    return render_template('mechanics_profile.html', user=row, mech=row1, shop=shop)
 
 
 
