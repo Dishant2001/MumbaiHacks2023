@@ -9,7 +9,7 @@ from flask_cors import CORS
 import random
 import string
 import hashlib
-import mail
+from mail import mail
 from datetime import datetime, timedelta
 from utility import *
 
@@ -49,6 +49,11 @@ def home():
 def requestMechanics():
     return render_template('user/request.html')
 
+@app.route("/logout",methods=['GET'])
+def logout():
+    session.clear()
+    return json.dumps({"mssg":200})
+
 @app.route('/login',methods=['GET','POST'])
 def login():
     if request.method=='POST' and session.get("uid")==None:
@@ -68,7 +73,7 @@ def login():
             hex_dig = hashPassword(password,salt)
             print(hex_dig)
             if hex_dig==row.password:
-                session['uid'] = row.username
+                session['uid'] = row.uid
                 session['role'] = row.role
                     
                     # print("logged in")
@@ -77,7 +82,7 @@ def login():
                 user_data = {
                         "uid": row.username,
                         "role": row.role,
-                        "username": row.name,
+                        "username": row.username,
                         "phone": row.phone,
                         "address":row.address
                 }
@@ -170,13 +175,10 @@ def signup():
             })
 
             query2 = """
-             INSERT into mechanicshop(shop_id,shop_name, location, phone_number,crn) VALUES(:uid,:name,:address,:phone,:crn)
+             INSERT into mechanicshop(shop_id,crn) VALUES(:uid,:crn)
             """
             db.session.execute(query2,{
                 "uid":uid,
-                "name":name,
-                "address":address,
-                "phone":phone,
                 "crn":crn
             })
 
@@ -216,10 +218,10 @@ def addmechanic():
             })
 
         query2 = """
-             INSERT into mechanics(mechanic_id, mechanic_name, mechanic_phone, shop_id, experience, specialization, rating, services) VALUES(:uid, :name, :phone, :shop_id, :experience, :specialization, :rating, :services)
+             INSERT into mechanics(mechanic_id, shop_id, experience, specialization, rating, services) VALUES(:uid,:shop_id, :experience, :specialization, :rating, :services)
             """
         db.session.execute(query2,{
-            "uid":uid, "name":name, "phone":phone, "shop_id":session.get('username'), "experience":experience, "specialization":specialization, "rating":rating, "services":services
+            "uid":uid,"shop_id":session.get('username'), "experience":experience, "specialization":specialization, "rating":rating, "services":services
         })
 
         db.session.commit()
@@ -228,6 +230,79 @@ def addmechanic():
 
         # redirect('/dashboard')
         return json.dumps({"mssg":200})
+    
+
+@app.route('/request',methods=['GET','POST'])
+def req():
+    if request.method=='POST' and session.get('uid') is not None and session.get('role') in ['4',4]:
+        data = request.get_json()
+        uid = session.get('uid')
+        car_pic = data['car_pic']
+        car_name = data['car_name']
+        car_brand = data['car_brand']
+        req = data['request']
+        user_latitude = data['user_latitude']
+        user_longitude = data['user_longitude']
+        timestamp = datetime.now()
+        status = 0
+        query = """
+                INSERT INTO requests (uid, car_pic, car_name, car_brand, request, user_latitude,user_longitude,timestamp_,status)
+                VALUES (:uid, :car_pic, :car_name, :car_brand, :request, :user_latitude,:user_longitude,:timestamp_,:status)
+            """
+        db.session.execute(query, {
+                "uid":uid, "car_pic":car_pic, "car_name":car_name, "car_brand":car_brand, "request":req, "user_latitude":user_latitude,"user_longitude":user_longitude,"timestamp_":timestamp,"status":status
+            })
+        db.session.commit()
+
+        return json.dumps({"mssg":200})
+    
+
+@app.route('/getNearestRequests',methods=['GET','POST'])
+def getNearestRequest():
+    if request.method=="POST" and session.get("uid") is not None and session.get("role") in [6,'6']:
+        data = request.get_json()
+        mech_lat = data['latitude']
+        mech_long = data['longitude']
+        query = """
+        SELECT *, 
+            (
+                6371 * 
+                acos(
+                    cos(radians(:given_latitude)) * 
+                    cos(radians(user_latitude)) * 
+                    cos(radians(user_longitude) - radians(:given_longitude)) + 
+                    sin(radians(:given_latitude)) * 
+                    sin(radians(user_latitude))
+                )
+            ) AS distance
+        FROM requests
+        ORDER BY distance;
+
+        """
+        results = db.session.execute(query,{
+            "given_latitude":mech_lat,
+            "given_longitude":mech_long,
+        })
+
+        req_list = []
+        
+        for req in results:
+            d = {}
+            d["customer"] = req.uid
+            d["car_pic"] = req.car_pic
+            d["car_name"] = req.car_name
+            d["car_brand"] = req.car_brand
+            d["request"] = req.request
+            d["request_id"] = req.request_id
+            d['user_latitude'] = str(req.user_latitude)
+            d['user_longitude'] = str(req.user_longitude)
+            d["timestamp"] = req.timestamp_.strftime("%Y-%m-%d %H:%M:%S")
+            req_list.append(d)
+
+        db.session.commit()
+
+        return json.dumps({"messg":200,"requests":req_list})
+
 
             
 
