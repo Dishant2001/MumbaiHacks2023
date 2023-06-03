@@ -11,37 +11,6 @@
 </main>
 
 <script>
-  function areLocationsSame(lat1, lon1, lat2, lon2, errorThreshold) {
-    var R = 6371; // Radius of the Earth in kilometers
-    var lat1Rad = degToRad(lat1);
-    var lat2Rad = degToRad(lat2);
-    var latDiff = degToRad(lat2 - lat1);
-    var lonDiff = degToRad(lon2 - lon1);
-  
-    var a = Math.sin(latDiff / 2) * Math.sin(latDiff / 2) +
-            Math.cos(lat1Rad) * Math.cos(lat2Rad) *
-            Math.sin(lonDiff / 2) * Math.sin(lonDiff / 2);
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    var distance = R * c; // Distance in kilometers
-
-    return distance <= errorThreshold;
-  }
-
-  function degToRad(deg) {
-      return deg * (Math.PI / 180);
-  }
-
-// Example usage
-// var lat1 = 37.7749;
-// var lon1 = -122.4194;
-// var lat2 = 37.7750;
-// var lon2 = -122.4193;
-  var errorThreshold = 0.1; // 0.1 km (100 meters)
-
-// var sameLocation = areLocationsSame(lat1, lon1, lat2, lon2, errorThreshold);
-// console.log(sameLocation); // Output: true
-
-
   function initMap() {
       // Specify the coordinates for the center of the map
       var centerCoordinates = { lat: 19.1093463, lng: 72.8858094 };
