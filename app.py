@@ -45,9 +45,9 @@ salt_length = 6
 def home():
     return render_template('user/index.html')
 
-@app.route('/request',methods=['GET','POST'])
-def requestMechanics():
-    return render_template('user/request.html')
+# @app.route('/request',methods=['GET','POST'])
+# def requestMechanics():
+#     return render_template('user/request.html')
 
 @app.route("/logout",methods=['GET'])
 def logout():
@@ -238,22 +238,22 @@ def req():
         data = request.get_json()
         uid = session.get('uid')
         car_pic = data['car_pic']
-        car_name = data['car_name']
+        car_name = data['car_brand']
         car_brand = data['car_brand']
-        req = data['request']
+        req = data['fault']
         user_latitude = data['user_latitude']
         user_longitude = data['user_longitude']
         timestamp = datetime.now()
         status = 0
-        query = """
-                INSERT INTO requests (uid, car_pic, car_name, car_brand, request, user_latitude,user_longitude,timestamp_,status)
-                VALUES (:uid, :car_pic, :car_name, :car_brand, :request, :user_latitude,:user_longitude,:timestamp_,:status)
-            """
-        db.session.execute(query, {
-                "uid":uid, "car_pic":car_pic, "car_name":car_name, "car_brand":car_brand, "request":req, "user_latitude":user_latitude,"user_longitude":user_longitude,"timestamp_":timestamp,"status":status
-            })
-        db.session.commit()
-
+        # query = """
+        #         INSERT INTO requests (uid, car_pic, car_name, car_brand, request, user_latitude,user_longitude,timestamp_,status)
+        #         VALUES (:uid, :car_pic, :car_name, :car_brand, :request, :user_latitude,:user_longitude,:timestamp_,:status)
+        #     """
+        # db.session.execute(query, {
+        #         "uid":uid, "car_pic":car_pic, "car_name":car_name, "car_brand":car_brand, "request":req, "user_latitude":user_latitude,"user_longitude":user_longitude,"timestamp_":timestamp,"status":status
+        #     })
+        # db.session.commit()
+        print(data)
         return json.dumps({"mssg":200})
     
 

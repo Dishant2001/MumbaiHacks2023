@@ -1,8 +1,5 @@
 
 {% extends "base.html" %}
-{% block title %}
-  Request
-{% endblock title %}
 {% block content %}
 <!-- <div id="result"></div> -->
 <main id="main" style="margin: 9rem 0rem 2rem 0rem;">
@@ -77,15 +74,15 @@ function showPosition(position) {
       base64String = event.target.result.split(',')[1]; // Remove the data URL prefix
       console.log(base64String);
       if (!base64String) {
-      base64String = undefined
+      base64String = undefined;
       }
       var formData = {
                     fault: document.getElementById('fault').value,
-                    latitude : position.coords.latitude,
-                    longitude : position.coords.longitude,
-                    car: document.getElementById('car').value,
+                    user_latitude : position.coords.latitude,
+                    user_longitude : position.coords.longitude,
+                    car_brand : document.getElementById('car').value,
                     special_instruction: document.getElementById('special_instruction').value,
-                    base64 : base64String
+                    car_pic : base64String
                     // email: $('#email').val()
                 };
   // $ajax
