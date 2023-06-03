@@ -302,6 +302,29 @@ def getNearestRequest():
         db.session.commit()
 
         return json.dumps({"messg":200,"requests":req_list})
+    
+@app.route('/acceptRequest',methods=['GET','POST'])
+def acceptRequest():
+    if request.method=="POST" and session.get("uid") is not None and session.get("role") in ['6',6]:
+        data = request.get_json()
+        mid = session.get('uid')
+        req_id = data['request_id']
+        mech_lat = data['latitude']
+        mech_long = data['longitude']
+        query = """
+        UPDATE requests SET status = 1, mech_latitude = :mech_lat, mech_longitude = :mech_long, mid = :mid WHERE request_id = :req_id;
+        """
+
+        db.session.execute(query,{
+            "mech_lat":mech_lat,
+            "mech_long":mech_long,
+            "mid":mid,
+            "req_id":req_id
+        })
+
+        db.session.commit()
+
+        return json.dumps({"mssg":200})
 
 
             
