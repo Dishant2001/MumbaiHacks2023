@@ -46,9 +46,12 @@ salt_length = 6
 def home():
     return render_template('user/index.html', request=request)
 
-# @app.route('/request',methods=['GET','POST'])
-# def requestMechanics():
-#     return render_template('user/request.html')
+@app.route('/new-request',methods=['GET','POST'])
+def requestMechanics():
+    if request.method=="GET" and session.get("uid") is not None:
+        return render_template('user/request.html')
+    else:
+        return render_template('login.html')
 
 @app.route("/logout",methods=['GET'])
 def logout():
@@ -59,10 +62,30 @@ def logout():
 def viewMechanical():
     return render_template('mechanics/view-mechanics.html', request=request)
 
+@app.route('/add-mechanics', methods=['GET','POST'])
+def addMechanical():
+    return render_template('mechanics/add-mechanical.html', request=request)
+
+@app.route('/mechanics-profile', methods=['GET','POST'])
+def mechanicProfile():
+    return render_template('mechanics/profile.html', request=request)
+
+@app.route('/view-request', methods=['GET','POST'])
+def viewRequest():
+    return render_template('mechanics/view-request.html', request=request)
+
+@app.route('/track-mechanics', methods=['GET','POST'])
+def trackMechanic():
+    return render_template('user/track-mechanics.html', request=request)
+
+@app.route('/track-users', methods=['GET','POST'])
+def trackUser():
+    return render_template('user/track-users.html', request=request)
+
 
 @app.route('/user-login', methods=['GET'])
 def authentication():
-    return render_template('login.html', request=request)
+    return render_template('login.html')
 
 @app.route('/login',methods=['GET','POST'])
 def login():
@@ -321,6 +344,7 @@ def updreq():
 @app.route('/getNearestRequests',methods=['GET','POST'])
 def getNearestRequest():
     if request.method=="POST" and session.get("uid") is not None and session.get("role") in [6,'6']:
+        print("Inside getrequests")
         data = request.get_json()
         mech_lat = data['latitude']
         mech_long = data['longitude']
@@ -457,9 +481,30 @@ def assignMechanic():
         query = """
         UPDATE requests SET mid = :mid WHERE request_id = :req_id 
         """
-        db.session.execute(query,{"req_id":req_id})
+        db.session.execute(query,{"req_id":req_id,"mid":mid})
         db.session.commit()
         return json.dumps({"mssg":200})
+    
+
+@app.route('/getMechanics',methods=['GET','POST'])
+def getMechanics():
+    print('Entered outside')
+    if request.method=='GET' and session.get('uid') is not None and session.get("role") in ['5',5]:
+        print("Entered inside")
+        query = """
+        SELECT * from mechanics WHERE shop_id=:shop_id 
+        """
+        results = db.session.execute(query,{"shop_id":session.get("uid")})
+        mech_list = []
+        for req in results:
+            d={}
+            d['mech_id'] = req.mechanic_id
+            d['experience'] = req.experience
+            d['specialization'] = req.specialization
+            d['rating'] = req.rating
+            d['services'] = req.services
+            mech_list.append(d)
+        return json.dumps({"mssg":200,"mechanics":mech_list})
     
 @app.route('/assignedRequests',methods=['GET',"POST"])
 def assignedRequests():

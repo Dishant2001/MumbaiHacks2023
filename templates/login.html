@@ -155,13 +155,9 @@
                     console.log(data['role'])
                     if (data['role'] == 4) {
                         console.log(data['role'])
-                        window.location = "/request"
-                    }
-                    else if (data['role'] == 6) {
-                        window.location.href = "/mech-profile"
-                    }
-                    else {
-                        window.location = '/'
+                        window.location.href = "/new-request"
+                    } else {
+                        window.location.href = '/'
                     }
                 })
                 .catch(error => {
