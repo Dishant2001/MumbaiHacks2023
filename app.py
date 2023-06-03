@@ -285,6 +285,38 @@ def req():
     else:
         return render_template('user/request.html', request=request)
     
+# @app.route('/fetchloc',methods=['GET'])
+# def locationfetch():
+#     r_id = session.get('')
+    
+@app.route('/update',methods=['GET','POST'])
+def updreq():
+    if request.method=='POST' and session.get('uid') is not None and session.get('role') in ['4',4]:
+        data = request.get_json()
+        uid = session.get('uid')
+        car_pic = data['car_pic']
+        car_name = data['car_brand']
+        car_brand = data['car_brand']
+        req = data['fault']
+        user_latitude = data['user_latitude']
+        user_longitude = data['user_longitude']
+        timestamp = datetime.now()
+        status = 0
+        query = text(
+            """
+                INSERT INTO requests (uid, car_pic, car_name, car_brand, request, user_latitude,user_longitude,timestamp_,status)
+                VALUES (:uid, :car_pic, :car_name, :car_brand, :request, :user_latitude,:user_longitude,:timestamp_,:status)
+            """
+        )
+        db.session.execute(query, {
+                "uid":uid, "car_pic":car_pic, "car_name":car_name, "car_brand":car_brand, "request":req, "user_latitude":user_latitude,"user_longitude":user_longitude,"timestamp_":timestamp,"status":status
+            })
+        db.session.commit()
+        print(data)
+        return json.dumps({"mssg":200})
+    else:
+        return render_template('user/request.html', request=request)
+    
 
 @app.route('/getNearestRequests',methods=['GET','POST'])
 def getNearestRequest():
