@@ -306,7 +306,7 @@ def getNearestRequest():
     
 @app.route('/acceptRequest',methods=['GET','POST'])
 def acceptRequest():
-    if request.method=="POST" and session.get("uid") is not None and session.get("role") in ['6',6]:
+    if request.method=="POST" and session.get("uid") is not None and session.get("role") in ['6',6] and session.get("req_id") is None:
         data = request.get_json()
         mid = session.get('uid')
         req_id = data['request_id']
@@ -324,6 +324,8 @@ def acceptRequest():
         })
 
         db.session.commit()
+
+        session['req_id'] = req_id
 
         return json.dumps({"mssg":200})
     
@@ -419,6 +421,7 @@ def assignedRequests():
             d['user_latitude'] = str(req.user_latitude)
             d['user_longitude'] = str(req.user_longitude)
             d["timestamp"] = req.timestamp_.strftime("%Y-%m-%d %H:%M:%S")
+            session['req_id'] = req.request_id
             req_list.append(d)
 
         db.session.commit()
@@ -443,7 +446,7 @@ def assignedRequests():
             data = request.get_json()
             mech_lat = data['latitude']
             mech_long = data['longitude']
-            req_id = data['request_id']
+            req_id = session.get("req_id")
             query = """
             UPDATE requests SET mech_latitude = :mech_lat, mech_longitude = :mech_long WHERE request_id = :req_id
             """
@@ -451,6 +454,25 @@ def assignedRequests():
             db.session.commit()
 
             return json.dumps({"mssg":200})
+        
+@app.route('/completeRequest',methods=['GET','POST'])
+def completeRequest():
+    if request.method=="POST" and session.get("uid") is not None and session.get("role") in ['6',6]:
+        mid = session.get('uid')
+        req_id = session.get("req_id")
+        query = """
+        UPDATE requests SET status = 2 WHERE request_id = :req_id;
+        """
+
+        db.session.execute(query,{
+            "req_id":req_id
+        })
+
+        db.session.commit()
+
+        session.pop("req_id")
+
+        return json.dumps({"mssg":200})
     
 
 
