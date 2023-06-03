@@ -187,14 +187,27 @@ def addmechanic():
         hex_dig = hashPassword(password,salt)
         role = 6 #mechanic
         query = """
-             INSERT into users VALUES({},{},{},{},{},{},{})
-            """.format(uid, name, phone, address, role, hex_dig, salt)
-        db.session.execute(query)
+                INSERT INTO users (uid, username, phone, address, role, password, salt)
+                VALUES (:uid, :name, :phone, :address, :role, :password, :salt)
+            """
+        db.session.execute(query, {
+                'uid': uid,
+                'name': name,
+                'phone': phone,
+                'address': address,
+                'role': role,
+                'password': hex_dig,
+                'salt': salt
+            })
 
         query2 = """
-             INSERT into mechanic VALUES({},{},{},{},{},{},{},{})
-            """.format(uid, name, phone, session.get('useername'), experience, specialization, rating, services)
-        db.session.execute(query2)
+             INSERT into mechanics(mechanic_id, mechanic_name, mechanic_phone, shop_id, experience, specialization, rating, services) VALUES(:uid, :name, :phone, :shop_id, :experience, :specialization, :rating, :services)
+            """
+        db.session.execute(query2,{
+            "uid":uid, "name":name, "phone":phone, "shop_id":session.get('username'), "experience":experience, "specialization":specialization, "rating":rating, "services":services
+        })
+
+        db.session.commit()
 
         mail.send_mail('mad1.21f1006594@gmail.com','lajihgnqebnnhlso', uid, uid, password, name)
 
