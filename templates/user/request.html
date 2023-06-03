@@ -1,7 +1,7 @@
 
 {% extends "base.html" %}
 {% block content %}
-
+<!-- <div id="result"></div> -->
 <main id="main" style="margin: 9rem 0rem 2rem 0rem;">
   <h3 class="h3">Request Reliable Mechanics</h3>
   <div class="container">
@@ -43,17 +43,77 @@
         </div>
 
         <div class="mt-5 d-flex justify-content-center">
-          <button class="btn btn-primary w-100 py-2">Request</button>
+          <button class="btn btn-primary w-100 py-2" type="button" onclick=requestsender()>Request</button>
         </div>
         <div class="my-3">
           <p class="text-center" ><a style="color:#37517e; font-size: 1rem; font-weight: 500;" href="">skip</a></p>
         </div>
 
-
+        
       </form>
     </div>
   </div>
 </main>
+<script>
+  function requestsender(){
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+  }
+
+}
+function showPosition(position) {
+  let base64String;
+  var fileInput = document.getElementById('car_photo');
+  
+  var file = fileInput.files[0];
+  console.log(file);
+  var reader = new FileReader();
+  
+  reader.onload = function(event) {
+    // console.log(event.target.result);
+      base64String = event.target.result.split(',')[1]; // Remove the data URL prefix
+      console.log(base64String);
+      if (!base64String) {
+      base64String = undefined
+      }
+      var formData = {
+                    fault: document.getElementById('fault').value,
+                    latitude : position.coords.latitude,
+                    longitude : position.coords.longitude,
+                    car: document.getElementById('car').value,
+                    special_instruction: document.getElementById('special_instruction').value,
+                    base64 : base64String
+                    // email: $('#email').val()
+                };
+  // $ajax
+  console.log(formData);
+  $.ajax({
+                type: 'POST',
+                url: '/request', // Replace with your Flask API endpoint
+                data: JSON.stringify(formData),
+                contentType: 'application/json',
+                success: function(response) {
+                    console.log('Data sent successfully!');
+                    console.log(response);
+                    
+                    // Clear the Base64 string
+                    base64String = null;
+                    document.getElementById('result').textContent = '';
+                },
+                error: function(error) {
+                    console.log('An error occurred while sending the image.');
+                    console.log(error);
+                }
+            });
+      // document.getElementById('result').textContent = base64String;
+  };
+  
+  reader.readAsDataURL(file);
+
+  
+}
+  
+</script>
 
 
 {% endblock content %}
