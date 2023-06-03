@@ -6,6 +6,7 @@
 <main id="main" style="margin: 4rem 0rem">
   <div class="container-fluid" >
     <div id="map" style="height:60vh;width: 100%;"></div>
+    <a  href="https://www.google.com/maps/dir/19.1093463,72.8858094/19.104,72.8758094/" class="d-flex justify-content-center"><Button>Find the Possible Routes</Button></a>
   </div>
 </main>
 
@@ -13,7 +14,7 @@
   function initMap(centerCoordinates={ lat: 19.1093463, lng: 72.8858094 },carCoordinates={ lat: 19.1093463, lng: 72.8858094 }  ,mecCoordinates={ lat: 19.104, lng: 72.8758094}) {
       // Specify the coordinates for the center of the map
       // var centerCoordinates = { lat: 19.1093463, lng: 72.8858094 };
-      
+      //centerCoordinates={ lat: 19.1093463, lng: 72.8858094 },carCoordinates={ lat: 19.1093463, lng: 72.8858094 }  ,mecCoordinates={ lat: 19.104, lng: 72.8758094}
       // Create a new map object and center it on the specified coordinates
       var map = new google.maps.Map(document.getElementById('map'), {
           center: centerCoordinates,
