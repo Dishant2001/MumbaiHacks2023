@@ -493,7 +493,10 @@ def completeRequest():
 
         return json.dumps({"mssg":200})
     
-
+        
+@app.route('/customer-profie',methods=['GET','POST'])
+def customer_proflie():
+    return render_template('customer_profile.html')
 
 
 
