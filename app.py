@@ -219,10 +219,10 @@ def addmechanic():
         salt = ''.join(random.choices(string.ascii_uppercase + string.digits, k=salt_length))
         hex_dig = hashPassword(password,salt)
         role = 6 #mechanic
-        query = """
+        query = text("""
                 INSERT INTO users (uid, username, phone, address, role, password, salt)
                 VALUES (:uid, :name, :phone, :address, :role, :password, :salt)
-            """
+            """)
         db.session.execute(query, {
                 'uid': uid,
                 'name': name,
@@ -233,19 +233,22 @@ def addmechanic():
                 'salt': salt
             })
 
-        query2 = """
-             INSERT into mechanics(mechanic_id, shop_id, experience, specialization, rating, services) VALUES(:uid,:shop_id, :experience, :specialization, :rating, :services)
-            """
+        query2 = text("""
+            INSERT into mechanics(mechanic_id, shop_id, experience, specialization, rating, services) VALUES(:uid,:shop_id, :experience, :specialization, :rating, :services)
+            """)
         db.session.execute(query2,{
             "uid":uid,"shop_id":session.get('username'), "experience":experience, "specialization":specialization, "rating":rating, "services":services
         })
 
         db.session.commit()
-
+        print('hel,')
         mail.send_mail('mad1.21f1006594@gmail.com','lajihgnqebnnhlso', uid, uid, password, name)
 
         # redirect('/dashboard')
         return json.dumps({"mssg":200})
+        
+    else:
+        return render_template('mechanics/add-mechanical.html')
     
 
 @app.route('/request',methods=['GET','POST'])
