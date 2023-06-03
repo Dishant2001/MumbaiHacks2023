@@ -68,7 +68,7 @@ def addMechanical():
 
 @app.route('/mechanics-profile', methods=['GET','POST'])
 def mechanicProfile():
-    return render_template('mechanics/profile.html', request=request)
+    return render_template('mechanics_profile.html')
 
 @app.route('/view-request', methods=['GET','POST'])
 def viewRequest():
