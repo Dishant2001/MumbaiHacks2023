@@ -1,4 +1,5 @@
 from flask import Flask, render_template, redirect, session, request, jsonify
+
 import json
 from dotenv.main import load_dotenv
 from flask_session import Session
@@ -14,6 +15,7 @@ from datetime import datetime, timedelta
 from utility import *
 
 app = Flask(__name__)
+
 CORS(app, resources={r"/*": {"origins": "*"}})
 # CORS(app)
 load_dotenv()
@@ -24,7 +26,6 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 db = SQLAlchemy(app)
-
 
 # class Users(db.Model):
 #     uid = db.Column(db.Integer, primary_key=True)
@@ -43,7 +44,7 @@ salt_length = 6
 
 @app.route('/',methods=['GET','POST'])
 def home():
-    return render_template('user/index.html')
+    return render_template('user/index.html', request=request)
 
 # @app.route('/request',methods=['GET','POST'])
 # def requestMechanics():
@@ -52,15 +53,15 @@ def home():
 @app.route("/logout",methods=['GET'])
 def logout():
     session.clear()
-    return json.dumps({"mssg":200})
+    return redirect('/user-login')
 
 @app.route('/view-mechanics', methods=['GET','POST'])
 def viewMechanical():
-    return render_template('mechanics/view-mechanics.html')
+    return render_template('mechanics/view-mechanics.html', request=request)
 
 @app.route('/user-login', methods=['GET'])
 def authentication():
-    return render_template('login.html')
+    return render_template('login.html', request=request)
 
 @app.route('/login',methods=['GET','POST'])
 def login():
@@ -121,13 +122,14 @@ def location():
 
 @app.route('/location',methods=['GET','POST'])
 def loc():
-    return render_template('user/track-mechanics.html')
+    return render_template('user/track-mechanics.html', request=request)
 
 @app.route('/signup',methods=['GET','POST'])
 def signup():
     if request.method=='POST' and session.get('uid') is None:
         data = request.get_json()
-        role = data['role']
+        print(data)
+        role = int(data['role'])
         
         salt = ''.join(random.choices(string.ascii_uppercase + string.digits, k=salt_length))
         
@@ -142,10 +144,12 @@ def signup():
             #  INSERT into users() VALUES({},{},{},{},{},{},{})
             # """.format(uid, name, phone, address, role, hex_dig, salt)
             # db.session.execute(query)
-            query = """
+            query = text(
+                """
                 INSERT INTO users (uid, username, phone, address, role, password, salt)
                 VALUES (:uid, :name, :phone, :address, :role, :password, :salt)
             """
+            )
             db.session.execute(query, {
                 'uid': uid,
                 'name': name,
@@ -166,10 +170,12 @@ def signup():
             crn = data['crn']
             password = data['password']
             hex_dig = hashPassword(password,salt)
-            query = """
+            query = text(
+                """
                 INSERT INTO users (uid, username, phone, address, role, password, salt)
                 VALUES (:uid, :name, :phone, :address, :role, :password, :salt)
             """
+            )
             db.session.execute(query, {
                 'uid': uid,
                 'name': name,
@@ -180,9 +186,11 @@ def signup():
                 'salt': salt
             })
 
-            query2 = """
+            query2 = text(
+                """
              INSERT into mechanicshop(shop_id,crn) VALUES(:uid,:crn)
             """
+            )
             db.session.execute(query2,{
                 "uid":uid,
                 "crn":crn
@@ -251,16 +259,20 @@ def req():
         user_longitude = data['user_longitude']
         timestamp = datetime.now()
         status = 0
-        query = """
+        query = text(
+            """
                 INSERT INTO requests (uid, car_pic, car_name, car_brand, request, user_latitude,user_longitude,timestamp_,status)
                 VALUES (:uid, :car_pic, :car_name, :car_brand, :request, :user_latitude,:user_longitude,:timestamp_,:status)
             """
+        )
         db.session.execute(query, {
                 "uid":uid, "car_pic":car_pic, "car_name":car_name, "car_brand":car_brand, "request":req, "user_latitude":user_latitude,"user_longitude":user_longitude,"timestamp_":timestamp,"status":status
             })
         db.session.commit()
         print(data)
         return json.dumps({"mssg":200})
+    else:
+        return render_template('user/request.html', request=request)
     
 
 @app.route('/getNearestRequests',methods=['GET','POST'])

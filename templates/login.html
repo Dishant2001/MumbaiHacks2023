@@ -48,21 +48,35 @@
 
                     <div class="input-field1">
 
-                        <input type="radio" name="Subject" value="Subject1"> Customer
-                        <input type="radio" name="Subject" value="Subject2"> Company
-                        <input type="radio" name="Subject" value="Subject3"> Shop
+                        <input type="radio" name="role" id="customer" value="4"> Customer
+                        <input type="radio" name="role" id="shop" value="5"> Shop
                     </div>
 
                     <div class="input-field">
                         <i class="fas fa-envelope"></i>
-                        <input type="Username" placeholder="Email" />
+                        <input type="text" name="username_s" id="username_s" placeholder="Email" />
                     </div>
+                    <div class="input-field">
+                        <i class="fas fa-user"></i>
+                        <input type="text" name="name" id="name" placeholder="Name" />
+                    </div>
+                    <div class="input-field">
+                        <i class="fas fa-phone"></i>
+                        <input type="text" name="phone" id="phone" placeholder="Phone" />
+                    </div>
+
+
+                    <div class="input-field" id="crn-container" style="display: none;">
+                        <i class="fas fa-briefcase"></i>
+                        <input type="text" name="crn" id="crn" placeholder="CRN" />
+                    </div>
+
 
                     <div class="input-field">
                         <i class="fas fa-lock"></i>
-                        <input type="password" placeholder="Password" />
+                        <input type="password" name="password_s" id="password_s" placeholder="Password" />
                     </div>
-                    <input type="submit" class="btn" value="Sign up" />
+                    <input type="button" class="btn" id="signup_button" value="Sign up" />
                     <p class="social-text">Or Sign up with social platforms</p>
                     <div class="social-media">
                         <a href="#" class="social-icon">
@@ -115,7 +129,7 @@
     <script>
         login_button = document.getElementById('login_button')
         login_button.addEventListener('click', () => {
-            var login_url = "http://127.0.0.1:8000/login"
+            var login_url = "/login"
             var requestOptions = {
                 method: 'POST',
                 headers: {
@@ -126,19 +140,122 @@
                     password: document.getElementById('login_password').value,
                 })
             };
-            signUpLookup();
+            fetch(login_url, requestOptions)
+                .then(response => {
+                    if (response.ok) {
+                        // Request was successful
+                        return response.json(); // Parse response data as JSON
+                    } else {
+                        // Request failed
+                        throw new Error('Request failed with status ' + response.status);
+                    }
+                })
+                .then(data => {
+                    // Handle the response data
+                    console.log(data['role'])
+                    if (data['role'] === 4) {
+                        console.log(data['role'])
+                        window.location = "/request"
+                    } else {
+                        window.location = '/'
+                    }
+                })
+                .catch(error => {
+                    // Handle any errors that occurred during the request
+                    console.error('Error:', error);
+                });
 
-            async function signUpLookup(){
-                const response = await fetch(login_url, requestOptions)
-                let data = response.json()
-                if (data['role'] === 4) {
-                    window.location = "/request"
+        })
+
+
+        signup_button = document.getElementById('signup_button')
+        signup_button.addEventListener('click', () => {
+            var s_url = "/signup"
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            }
+            var lat, lon;
+            function showPosition(position) {
+                lat = position.coords.latitude
+                lon = position.coords.longitude
+
+                var role = document.querySelector('input[name="role"]:checked').value;
+                if (role == 5) {
+                    var crn = document.getElementById('crn').value
+                    data_request = {
+                        username: document.getElementById('username_s').value,
+                        password: document.getElementById('password_s').value,
+                        role: role,
+                        name: document.getElementById('name').value,
+                        phone: document.getElementById('phone').value,
+                        address: lat + '+' + lon,
+                        crn: crn
+                    }
+                } else {
+                    data_request = {
+                        username: document.getElementById('username_s').value,
+                        password: document.getElementById('password_s').value,
+                        role: role,
+                        name: document.getElementById('name').value,
+                        phone: document.getElementById('phone').value,
+                        address: lat + '+' + lon
+                    }
                 }
-                window.location = "/"
+                var requestOptions = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data_request)
+                };
+                fetch(s_url, requestOptions)
+                    .then(response => {
+                        if (response.ok) {
+                            // Request was successful
+                            return response.json(); // Parse response data as JSON
+                        } else {
+                            // Request failed
+                            throw new Error('Request failed with status ' + response.status);
+                        }
+                    })
+                    .then(data => {
+                        // Handle the response data
+                        console.log(data['role'])
+                        if (data['role'] == 4) {
+                            console.log(data['role'])
+                            window.location = "/request"
+                        } else {
+                            window.location = '/'
+                        }
+                    })
+                    .catch(error => {
+                        // Handle any errors that occurred during the request
+                        console.error('Error:', error);
+                    });
 
             }
 
+
+
         })
+
+        var customer = document.getElementById('customer')
+        var shop = document.getElementById('shop')
+
+        shop.addEventListener('change', () => {
+            if (shop.checked) {
+                let container = document.getElementById('crn-container')
+                container.style.display = ''
+            }
+        })
+
+        customer.addEventListener('change', () => {
+            let container = document.getElementById('crn-container')
+            container.style.display = 'none'
+
+        })
+
+
     </script>
     <script src="../static/login.js"></script>
 </body>
