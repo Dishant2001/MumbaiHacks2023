@@ -43,7 +43,11 @@ salt_length = 6
 
 @app.route('/',methods=['GET','POST'])
 def home():
-    return render_template('index.html')
+    return render_template('user/index.html')
+
+@app.route('/request',methods=['GET','POST'])
+def requestMechanics():
+    return render_template('user/request.html')
 
 @app.route('/login',methods=['GET','POST'])
 def login():
