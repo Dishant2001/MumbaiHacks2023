@@ -70,6 +70,16 @@
         </div>
       </div>
     </div>
+
+    <table id="requests">
+      <tbody>
+        <!-- <tr>
+          <td>Carname</td>
+          <td>Timestamp</td>
+          <td><button>Pending</button></td>
+        </tr> -->
+      </tbody>
+    </table>
     
     <section>
       <div class="container py-5">
@@ -194,6 +204,26 @@
 </main>
 
 <script>
+
+async function getRequests(){
+  const response = await fetch('/getUserRequests');
+  const data = await response.json();
+  data.requests.forEach(req => {
+    var row = document.createElement("tr");
+    row.innerHTML = `
+    <tr>
+          <td>${req.car_name}</td>
+          <td>${req.timestamp}</td>
+          ${req.status==0?' <td><a href="#" disabled> <button>Pending</button></a></td>':` <td><a href="/track-users/${req.request_id}"> <button>Navigate</button></a></td>`}
+         
+         
+        </tr>
+    `;
+    document.getElementById("requests").getElementsByTagName("tbody")[0].appendChild(row);
+  });
+}
+
+getRequests();
 
 document.getElementById("get-started").innerText = "Logout";
 

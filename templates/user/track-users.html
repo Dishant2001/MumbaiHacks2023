@@ -13,111 +13,110 @@ Track
 </main>
 
 <script>
-  function TrackFunction() {
-    if (navigator.geolocation) {
-      navigator.geolocation.watchPosition(updateLocation);
-    }
-    // Add your function logic here
+  // function TrackFunction() {
+  //   if (navigator.geolocation) {
+  //     navigator.geolocation.watchPosition(updateLocation);
+  //   }
+  //   // Add your function logic here
+  // }
+  function areLocationsSame(lat1, lon1, lat2, lon2, errorThreshold) {
+    var R = 6371; // Radius of the Earth in kilometers
+    var lat1Rad = degToRad(lat1);
+    var lat2Rad = degToRad(lat2);
+    var latDiff = degToRad(lat2 - lat1);
+    var lonDiff = degToRad(lon2 - lon1);
+  
+    var a = Math.sin(latDiff / 2) * Math.sin(latDiff / 2) +
+            Math.cos(lat1Rad) * Math.cos(lat2Rad) *
+            Math.sin(lonDiff / 2) * Math.sin(lonDiff / 2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    var distance = R * c; // Distance in kilometers
+
+    return distance <= errorThreshold;
   }
-  function updateLocation(position) {
-    var latitude = position.coords.latitude;
-    var longitude = position.coords.longitude;
-    var newdata = {
-      latitude: latitude,
-      longitude: longitude
-    }
-    $.ajax({
-      type: 'POST',
-      url: '/request', // Replace with your Flask API endpoint
-      data: JSON.stringify(newdata),
-      contentType: 'application/json',
-      success: function (response) {
-        console.log('Data sent successfully!');
-        console.log(response);
-        if (!response.status) {
-          TrackFunction();
-        }
-        else {
-          console.log('Task Completed');
-        }
 
-      },
-      error: function (error) {
-        console.log('An error occurred while sending the image.');
-        console.log(error);
-      }
-    })
-      .then(function (data) {
-        // Process the response data (assuming the API response is in JSON format)
-        var centerCoordinates = { lat: data.user_latitude, lng: data.user_longitude };
-        var carCoordinates = centerCoordinates;
-        var mecCoordinates = { lat: data.mec_latitude, lng: data.mec_longitude }
+  function degToRad(deg) {
+      return deg * (Math.PI / 180);
+  }
 
-        // Display coordinates on the Google Maps API
-        var map = new google.maps.Map(document.getElementById('map'), {
-          center: centerCoordinates,
-          zoom: 15, // Adjust the zoom level as needed
-          styles: [
-            {
-              featureType: "poi",
-              elementType: "labels",
-              stylers: [
-                { visibility: "off" }
-              ]
-            }
+// Example usage
+// var lat1 = 37.7749;
+// var lon1 = -122.4194;
+// var lat2 = 37.7750;
+// var lon2 = -122.4193;
+  var errorThreshold = 0.1; 
+  async function updateLocation() {
+    let res = await fetch('/myRequest')
+    let data = await res.json()
+    // Process the response data (assuming the API response is in JSON format)
+    var centerCoordinates = { lat: data.user_latitude, lng: data.user_longitude };
+    var carCoordinates = centerCoordinates;
+    var mecCoordinates = { lat: data.mech_latitude, lng: data.mech_longitude }
+
+    // Display coordinates on the Google Maps API
+    var map = new google.maps.Map(document.getElementById('map'), {
+      center: centerCoordinates,
+      zoom: 15, // Adjust the zoom level as needed
+      styles: [
+        {
+          featureType: "poi",
+          elementType: "labels",
+          stylers: [
+            { visibility: "off" }
           ]
-        });
-
-        var car = "M17.402,0H5.643C2.526,0,0,3.467,0,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759c3.116,0,5.644-2.527,5.644-5.644 V6.584C23.044,3.467,20.518,0,17.402,0z M22.057,14.188v11.665l-2.729,0.351v-4.806L22.057,14.188z M20.625,10.773 c-1.016,3.9-2.219,8.51-2.219,8.51H4.638l-2.222-8.51C2.417,10.773,11.3,7.755,20.625,10.773z M3.748,21.713v4.492l-2.73-0.349 V14.502L3.748,21.713z M1.018,37.938V27.579l2.73,0.343v8.196L1.018,37.938z M2.575,40.882l2.218-3.336h13.771l2.219,3.336H2.575z M19.328,35.805v-7.872l2.729-0.355v10.048L19.328,35.805z";
-        var icon = {
-          path: car,
-          scale: .9,
-          strokeColor: 'black',
-          strokeWeight: .10,
-          fillOpacity: 1,
-          fillColor: 'red',
-          offset: '0%',
-          // rotation: parseInt(heading[i]),
-          anchor: new google.maps.Point(10, 25) // orig 10,50 back of car, 10,0 front of car, 10,25 center of car
-        };
-        // Create a new marker object and position it at the specified coordinates
-
-        var marker = new google.maps.Marker({
-          position: carCoordinates,
-          map: map,
-          icon: icon,
-          title: 'Car Location' // Add a title for the marker (optional)
-        });
-
-        var mecCoordinates = { lat: 19.104, lng: 72.8758094 };
-        var marker = new google.maps.Marker({
-          position: mecCoordinates,
-          map: map,
-          // icon : icon,
-          title: 'Mechanic Location' // Add a title for the marker (optional)
-        });
-        var errorThreshold = 0.1;
-        // Check the condition to stop the interval
-        if (areLocationsSame(data.user_latitude, data.user_longitude, data.mec_latitude, data.mec_longitude, errorThreshold)) {
-          clearInterval(intervalId);
         }
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+      ]
+    });
+
+    var car = "M17.402,0H5.643C2.526,0,0,3.467,0,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759c3.116,0,5.644-2.527,5.644-5.644 V6.584C23.044,3.467,20.518,0,17.402,0z M22.057,14.188v11.665l-2.729,0.351v-4.806L22.057,14.188z M20.625,10.773 c-1.016,3.9-2.219,8.51-2.219,8.51H4.638l-2.222-8.51C2.417,10.773,11.3,7.755,20.625,10.773z M3.748,21.713v4.492l-2.73-0.349 V14.502L3.748,21.713z M1.018,37.938V27.579l2.73,0.343v8.196L1.018,37.938z M2.575,40.882l2.218-3.336h13.771l2.219,3.336H2.575z M19.328,35.805v-7.872l2.729-0.355v10.048L19.328,35.805z";
+    var icon = {
+      path: car,
+      scale: .9,
+      strokeColor: 'black',
+      strokeWeight: .10,
+      fillOpacity: 1,
+      fillColor: 'red',
+      offset: '0%',
+      // rotation: parseInt(heading[i]),
+      anchor: new google.maps.Point(10, 25) // orig 10,50 back of car, 10,0 front of car, 10,25 center of car
+    };
+    // Create a new marker object and position it at the specified coordinates
+
+    var marker = new google.maps.Marker({
+      position: carCoordinates,
+      map: map,
+      icon: icon,
+      title: 'Car Location' // Add a title for the marker (optional)
+    });
+
+    // var mecCoordinates = { lat: 19.104, lng: 72.8758094 };
+    var marker = new google.maps.Marker({
+      position: mecCoordinates,
+      map: map,
+      // icon : icon,
+      title: 'Mechanic Location' // Add a title for the marker (optional)
+    });
+    var errorThreshold = 0.1;
+    // Check the condition to stop the interval
+    if (areLocationsSame(data.user_latitude, data.user_longitude, data.mec_latitude, data.mec_longitude, errorThreshold)) {
+      clearInterval(intervalId);
+    }
+
+
   }
 
   // Call the function initially
-  TrackFunction();
+  updateLocation();
 
   // Call the function every 15 seconds
-  intervalId = setInterval(TrackFunction, 15000);
+  intervalId = setInterval(updateLocation, 15000);
 </script>
 
 <!-- Include the Google Maps JavaScript API -->
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC4PI_7hMDA-ek0LWabI6JOKECrMoEpf1Y&callback=TrackFunction" async
-  defer></script>
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC4PI_7hMDA-ek0LWabI6JOKECrMoEpf1Y&callback=updateLocation"
+  async defer></script>
 
 
 {% endblock content %}

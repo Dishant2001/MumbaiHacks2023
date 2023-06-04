@@ -74,12 +74,27 @@ def mechanicProfile():
 def viewRequest():
     return render_template('mechanics/view-request.html', request=request)
 
-@app.route('/track-mechanics', methods=['GET','POST'])
-def trackMechanic():
+@app.route('/track-mechanics/<id>', methods=['GET','POST'])
+def trackMechanic(id):
+    session['request_id'] = id
     return render_template('user/track-mechanics.html', request=request)
 
-@app.route('/track-users', methods=['GET','POST'])
-def trackUser():
+@app.route('/getRequestData',methods=["GET"])
+def getReqData():
+    req_id = session.get("request_id")
+    query = """
+        SELECT * FROM requests WHERE request_id = :req_id
+        """
+    row = db.session.execute(query,{"req_id":req_id}).fetchone()
+    d={}
+    d['user_latitude'] = float(row.user_latitude)
+    d['user_longitude'] = float(row.user_longitude)
+
+    return json.dumps({"data":d})
+
+@app.route('/track-users/<id>', methods=['GET','POST'])
+def trackUser(id):
+    session["request_id"] = id
     return render_template('user/track-users.html', request=request)
 
 
@@ -472,6 +487,58 @@ def getShopNearestRequests():
         return json.dumps({"messg":200,"requests":req_list})
     
 
+@app.route('/getRequests',methods = ["GET","POST"])
+def getRequests():
+    if request.method=="GET" and session.get("uid") is not None and session.get("role") in [6,'6']:
+        # data = request.get_json()
+        # mech_lat = data['latitude']
+        # mech_long = data['longitude']
+        query = """
+        SELECT * FROM requests WHERE mid = :mid
+        """
+        results = db.session.execute(query,{"mid":session.get("uid")})
+
+        
+
+        req_list = []
+        
+        for req in results:
+            d = {}
+            
+            d["car_name"] = req.car_name
+            d["request_id"] = req.request_id
+            d["timestamp"] = req.timestamp_.strftime("%Y-%m-%d %H:%M:%S")
+            req_list.append(d)
+
+        return json.dumps({"messg":200,"requests":req_list})
+    
+@app.route('/getUserRequests',methods = ["GET","POST"])
+def getUserRequests():
+    if request.method=="GET" and session.get("uid") is not None and session.get("role") in [4,'4']:
+        # data = request.get_json()
+        # mech_lat = data['latitude']
+        # mech_long = data['longitude']
+        query = """
+        SELECT * FROM requests WHERE uid = :uid
+        """
+        results = db.session.execute(query,{"uid":session.get("uid")})
+
+        
+
+        req_list = []
+        
+        for req in results:
+            d = {}
+            
+            d["car_name"] = req.car_name
+            d["request_id"] = req.request_id
+            d['status'] = req.status
+            d["timestamp"] = req.timestamp_.strftime("%Y-%m-%d %H:%M:%S")
+            req_list.append(d)
+
+        return json.dumps({"messg":200,"requests":req_list})
+    
+
 @app.route('/assignMechanic',methods=['GET','POST'])
 def assignMechanic():
     if request.method=='POST' and session.get('uid') is not None and session.get("role") in ['5',5]:
@@ -535,35 +602,49 @@ def assignedRequests():
 
         return json.dumps({"messg":200,"requests":req_list})
     
-    @app.route('/getMechLocation/<id>',methods=['GET','POST'])
-    def getMechLocation(id):
-        if request.method=="GET" and session.get("uid") is not None and session.get("role") in [4,'4']:
-            query = """
-            SELECT * from requests WHERE request_id = :req_id
-            """
-            results = db.session.execute(query,{"req_id":id}).fetchone()
-            if results:
-                latitude = results.mech_latitude
-                longitude = results.mech_longitude
-                return json.dumps({"latitude":latitude,"longitude":longitude})
+@app.route('/getMechLocation/<id>',methods=['GET','POST'])
+def getMechLocation(id):
+    if request.method=="GET" and session.get("uid") is not None and session.get("role") in [4,'4']:
+        query = """
+        SELECT * from requests WHERE request_id = :req_id
+        """
+        results = db.session.execute(query,{"req_id":id}).fetchone()
+        if results:
+            latitude = results.mech_latitude
+            longitude = results.mech_longitude
+            return json.dumps({"latitude":latitude,"longitude":longitude})
+        
+@app.route('/myRequest',methods=['GET','POST'])
+def myRequest():
+    if request.method=="GET" and session.get("uid") is not None and session.get("role") in [4,'4']:
+        query = """
+        SELECT * from requests WHERE request_id = :req_id
+        """
+        results = db.session.execute(query,{"req_id":session.get("request_id")}).fetchone()
+        print(results)
+        if results:
+            user_latitude = float(results.user_latitude)
+            user_longitude = float(results.user_longitude)
+            mech_latitude = float(results.mech_latitude)
+            mech_longitude = float(results.mech_longitude)
+            return json.dumps({"user_latitude":user_latitude,"user_longitude":user_longitude,"mech_latitude":mech_latitude,"mech_longitude":mech_longitude})
     
-    @app.route('/updateMechanicLocation',methods=['GET','POST'])
-    def updatelocation():
-        if request.method=="POST" and session.get("uid") is not None and session.get("role") in ['6',6]:
-            data = request.get_json()
-            mech_lat = data['latitude']
-            mech_long = data['longitude']
-            req_id = session.get("req_id")
-            query = """
-            UPDATE requests SET mech_latitude = :mech_lat, mech_longitude = :mech_long WHERE request_id = :req_id
-            """
-            db.session.execute(query,{"req_id":req_id,"mech_lat":mech_lat,"mech_long":mech_long})
-            db.session.commit()
-
-            if session.get("status") is None:
-                return json.dumps({"status":2})
-
-            return json.dumps({"mssg":200})
+@app.route('/updateMechanicLocation',methods=['GET','POST'])
+def updateloc():
+    if request.method=='POST' and session.get("uid") is not None and session.get("role") in ['6',6]:
+        data = request.get_json()
+        mech_lat = data['latitude']
+        mech_long = data['longitude']
+        req_id = session.get("request_id")
+        print(req_id)
+        query = """
+        UPDATE requests SET mech_latitude = :mech_lat, mech_longitude = :mech_long WHERE request_id = :req_id
+        """
+        db.session.execute(query,{"req_id":req_id,"mech_lat":mech_lat,"mech_long":mech_long})
+        db.session.commit()
+        if session.get("status") is None:
+            return json.dumps({"status":2})
+        return json.dumps({"mssg":200})
         
 @app.route('/completeRequest',methods=['GET','POST'])
 def completeRequest():
@@ -587,7 +668,7 @@ def completeRequest():
     
         
 @app.route('/customer-profile',methods=['GET','POST'])
-def customer_proflie():
+def customer_profile():
     uid = session.get('uid')
     query = text(f"SELECT * FROM users WHERE uid='{uid}';")
     row = db.session.execute(query).first()

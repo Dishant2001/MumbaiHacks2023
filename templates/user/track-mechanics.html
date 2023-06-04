@@ -15,7 +15,7 @@
     navigator.geolocation.getCurrentPosition(updatelink);
   }
   function updatelink(position){
-    fetch('https://api.example.com/data')
+    fetch('/getRequestData')
   .then(function(response) {
     if (response.ok) {
       return response.json();
@@ -26,8 +26,9 @@
   .then(function(data) {
     console.log(data);
     var link = document.getElementById("redirect");
-    link.href = "https://www.google.com/maps/dir/"+position.coords.latitude+","+position.coords.longitude+"/"+data.user_latitude+","+data.user_longitude+"/";
+    link.href = "https://www.google.com/maps/dir/"+position.coords.latitude+","+position.coords.longitude+"/"+data.data.user_latitude+","+data.data.user_longitude+"/";
     // Process the response data here
+    initMap({lat:data.data.user_latitude,lng:data.data.user_longitude},{lat:position.coords.latitude,lng:position.coords.longitude})
   })
   .catch(function(error) {
     console.log(error);
@@ -38,6 +39,9 @@
     if (navigator.geolocation) {
                 navigator.geolocation.watchPosition(updateLocation, handleLocationError);
     }
+    else{
+      console.log("navigator not present");
+    }
             // Add your function logic here
     }
     function updateLocation(position) {
@@ -47,8 +51,9 @@
               latitude : latitude,
               longitude : longitude
             }
+            console.log(newdata)
             $.ajax({
-                type: 'POST',
+                method: 'POST',
                 url: '/updateMechanicLocation', // Replace with your Flask API endpoint
                 data: JSON.stringify(newdata),
                 contentType: 'application/json',
@@ -57,7 +62,7 @@
                     console.log(response);
                     if (!response.status){
                       setInterval(TrackFunction(), 10000);
-                      TrackFunction();
+                      // TrackFunction();
                     }
                     else{
 
@@ -90,8 +95,10 @@
                     break;
             }
         }
-  window.onload = TrackFunction;
-  window.onload = MapFunction;
+  // window.onload = TrackFunction;
+  // window.onload = MapFunction;
+  TrackFunction();
+  MapFunction();
   function areLocationsSame(lat1, lon1, lat2, lon2, errorThreshold) {
     var R = 6371; // Radius of the Earth in kilometers
     var lat1Rad = degToRad(lat1);
@@ -123,11 +130,11 @@
 // console.log(sameLocation); // Output: true
 
 
-  function initMap() {
+  function initMap(centerCoordinates,mecCoordinates) {
       // Specify the coordinates for the center of the map
-      var centerCoordinates = { lat: 19.1093463, lng: 72.8858094 };
       //centerCoordinates={ lat: 19.1093463, lng: 72.8858094 },carCoordinates={ lat: 19.1093463, lng: 72.8858094 }  ,mecCoordinates={ lat: 19.104, lng: 72.8758094}
       // Create a new map object and center it on the specified coordinates
+      var carCoordinates = centerCoordinates;
       var map = new google.maps.Map(document.getElementById('map'), {
           center: centerCoordinates,
           zoom: 15, // Adjust the zoom level as needed
@@ -143,7 +150,7 @@
       });
       
       // Specify the coordinates for the location where you want to display the icon
-      var carCoordinates = { lat: 19.1093463, lng: 72.8858094};
+      // var carCoordinates = { lat: 19.1093463, lng: 72.8858094};
       var car = "M17.402,0H5.643C2.526,0,0,3.467,0,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759c3.116,0,5.644-2.527,5.644-5.644 V6.584C23.044,3.467,20.518,0,17.402,0z M22.057,14.188v11.665l-2.729,0.351v-4.806L22.057,14.188z M20.625,10.773 c-1.016,3.9-2.219,8.51-2.219,8.51H4.638l-2.222-8.51C2.417,10.773,11.3,7.755,20.625,10.773z M3.748,21.713v4.492l-2.73-0.349 V14.502L3.748,21.713z M1.018,37.938V27.579l2.73,0.343v8.196L1.018,37.938z M2.575,40.882l2.218-3.336h13.771l2.219,3.336H2.575z M19.328,35.805v-7.872l2.729-0.355v10.048L19.328,35.805z";
       var icon = {
       path: car,
@@ -165,7 +172,7 @@
           title: 'Car Location' // Add a title for the marker (optional)
       });
 
-      var mecCoordinates = { lat: 19.104, lng: 72.8758094};
+      // var mecCoordinates = { lat: 19.104, lng: 72.8758094};
       var marker = new google.maps.Marker({
           position: mecCoordinates,
           map: map,

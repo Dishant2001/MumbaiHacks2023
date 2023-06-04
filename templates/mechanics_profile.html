@@ -88,7 +88,6 @@
                   <p class="text-muted mb-0"></p>
                 </div>
               </div>
-              <a href="{{url_for('loc')}}" class=" my-3 btn btn-primary w-50 mx-auto">Track User</a>
             </div>
 
           </div>
@@ -96,6 +95,17 @@
         </div>
       </div>
     </div>
+
+    <table id="requests">
+      <tbody>
+        <!-- <tr>
+          <td>Carname</td>
+          <td>Timestamp</td>
+          <td><button>Pending</button></td>
+        </tr> -->
+      </tbody>
+    </table>
+
     <section>
       <div class="container py-5">
         <div class="row d-flex justify-content-center">
@@ -219,6 +229,25 @@
 </main>
 
 <script>
+
+async function getRequests(){
+  const response = await fetch('/getRequests');
+  const data = await response.json();
+  data.requests.forEach(req => {
+    var row = document.createElement("tr");
+    row.innerHTML = `
+    <tr>
+          <td>${req.car_name}</td>
+          <td>${req.timestamp}</td>
+          <td><a href="/track-mechanics/${req.request_id}"> <button>Navigate</button></a></td>
+        </tr>
+    `;
+    document.getElementById("requests").getElementsByTagName("tbody")[0].appendChild(row);
+  });
+}
+
+getRequests();
+
 
 document.getElementById("get-started").innerText = "Logout";
 
