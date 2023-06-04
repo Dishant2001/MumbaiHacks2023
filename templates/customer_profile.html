@@ -61,9 +61,7 @@
                 </div>
               </div>
               <hr>
-              
-
-              <a href="{{url_for('loc_user')}}" class="btn btn-primary w-50 mx-auto">Track Mechanics</a>
+            
             </div>
           </div>
          
@@ -71,15 +69,17 @@
       </div>
     </div>
 
-    <table id="requests">
-      <tbody>
-        <!-- <tr>
-          <td>Carname</td>
-          <td>Timestamp</td>
-          <td><button>Pending</button></td>
-        </tr> -->
-      </tbody>
-    </table>
+    <div class="container w-50 mx-auto">
+      <table id="requests" class="table">
+        <tbody>
+          <tr>
+            <th>Carname</td>
+            <th>Timestamp</td>
+            <th>Status</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     
     <section>
       <div class="container py-5">
@@ -214,7 +214,7 @@ async function getRequests(){
     <tr>
           <td>${req.car_name}</td>
           <td>${req.timestamp}</td>
-          ${req.status==0?' <td><a href="#" disabled> <button>Pending</button></a></td>':` <td><a href="/track-users/${req.request_id}"> <button>Navigate</button></a></td>`}
+          ${req.status==0?` <td><a class="btn btn-primary" href="#" style="pointer-events:none;background-color:#4669a5">Pending</a></td>`:` <td><a class="btn btn-primary" href="/track-users/${req.request_id}"> Navigate</a></td>`}
          
          
         </tr>

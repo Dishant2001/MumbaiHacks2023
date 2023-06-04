@@ -68,7 +68,14 @@ def addMechanical():
 
 @app.route('/mechanics-profile', methods=['GET','POST'])
 def mechanicProfile():
-    return render_template('mechanics_profile.html')
+    uid = session.get('uid')
+    query = text(f"SELECT * FROM users WHERE uid='{uid}';")
+    row = db.session.execute(query).first()
+    query = text(f"SELECT * FROM mechanics WHERE mechanic_id='{uid}';")
+    row1 = db.session.execute(query).first()
+    query = text(f"SELECT username FROM users WHERE uid='{row1[1]}'")
+    shop = db.session.execute(query).first()
+    return render_template('mechanics_profile.html',  user=row, mech=row1, shop=shop)
 
 @app.route('/view-request', methods=['GET','POST'])
 def viewRequest():
@@ -685,16 +692,6 @@ def shop_proflie():
     print(row, row1)
     return render_template('shop_profile.html',user=row, shop=row1,)
 
-@app.route('/mech-profile',methods=['GET','POST'])
-def mech_proflie():
-    uid = session.get('uid')
-    query = text(f"SELECT * FROM users WHERE uid='{uid}';")
-    row = db.session.execute(query).first()
-    query = text(f"SELECT * FROM mechanics WHERE mechanic_id='{uid}';")
-    row1 = db.session.execute(query).first()
-    query = text(f"SELECT username FROM users WHERE uid='{row1[1]}'")
-    shop = db.session.execute(query).first()
-    return render_template('mechanics_profile.html', user=row, mech=row1, shop=shop)
 
 
 
