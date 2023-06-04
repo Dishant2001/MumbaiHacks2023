@@ -270,6 +270,7 @@ def addmechanic():
         salt = ''.join(random.choices(string.ascii_uppercase + string.digits, k=salt_length))
         hex_dig = hashPassword(password,salt)
         role = 6 #mechanic
+       
         query = text("""
                 INSERT INTO users (uid, username, phone, address, role, password, salt)
                 VALUES (:uid, :name, :phone, :address, :role, :password, :salt)

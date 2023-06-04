@@ -66,7 +66,7 @@
           </li> -->
           <li><a class="nav-link scrollto" href="#contact">Contact</a></li>
 
-          <li><a class="getstarted scrollto" href="{{ url_for('authentication') }}">Get Started</a></li>
+          <li><a class="getstarted scrollto" href="{{ url_for('authentication') }} " id="get-started">Get Started</a></li>
           
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
@@ -539,6 +539,14 @@
       class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
+  <script>
+    document.getElementById("get-started").innerText = "Logout";
+
+document.getElementById("get-started").addEventListener("click",async ()=>{
+  const response = await fetch("/logout");
+  const data = await response.json();
+})
+  </script>
   <script src="../../static/assets/vendor/aos/aos.js"></script>
   <script src="../../static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="../../static/assets/vendor/glightbox/js/glightbox.min.js"></script>

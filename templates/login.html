@@ -156,9 +156,17 @@
                     if (data['role'] == 4) {
                         console.log(data['role'])
                         window.location.href = "/new-request"
-                    } else {
-                        window.location.href = '/'
                     }
+                    else if (data['role'] == 5) {
+                        console.log(data['role'])
+                        window.location.href = "/shop-profile"
+                    }
+                    else if (data['role'] == 6) {
+                        console.log(data['role'])
+                        window.location.href = "/mechanics-profile"
+                    }
+
+            
                 })
                 .catch(error => {
                     // Handle any errors that occurred during the request
