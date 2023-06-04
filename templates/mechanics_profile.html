@@ -241,7 +241,7 @@ async function getRequests(){
     <tr>
           <td>${req.car_name}</td>
           <td>${req.timestamp}</td>
-          ${req.status==1?`<td><a class="btn btn-primary" href="/track-mechanics/${req.request_id}>Navigate</a></td>`:`<td><a class="btn btn-primary" style="pointer-events:none;background-color:#4669a5;" href="#">Complete</a></td>`}
+          ${req.status==1?`<td><a class="btn btn-primary" href="/track-mechanics/${req.request_id}">Navigate</a></td>`:`<td><a class="btn btn-primary" style="pointer-events:none;background-color:#4669a5;" href="#">Complete</a></td>`}
           
         </tr>
     `;
