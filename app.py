@@ -599,11 +599,7 @@ def getMechanics():
 @app.route('/assignedRequests',methods=['GET',"POST"])
 def assignedRequests():
     if request.method=="GET" and session.get("uid") is not None and session.get("role") in [6,'6']:
-        query = text(
-            """
-        SELECT * from requests WHERE mid=:mid AND mech_latitude IS NULL
-        """
-        )
+        query = text('SELECT * from requests WHERE mid=:mid AND mech_latitude IS NULL;')
         results = db.session.execute(query,{"mid":session.get("uid")})
         
         req_list = []
