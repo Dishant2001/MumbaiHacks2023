@@ -85,7 +85,8 @@
           <li><a class="nav-link scrollto active" href="{{url_for('customer_profile')}}">Profile</a></li>
           {% elif session.role == 5 %}
           <li><a class="nav-link scrollto active" href="{{url_for('addMechanical')}}">Add Mechanics</a></li>
-          <li><a class="nav-link scrollto active" href="{{url_for('viewMechanical')}}">View Mechanics</a></li>
+          <li><a class="nav-link scrollto active" href="{{url_for('viewRequest')}}">Requests</a></li>
+          <li><a class="nav-link scrollto active" href="{{url_for('viewMechanical')}}">Available Mechanics</a></li>
           <li><a class="nav-link scrollto active" href="{{url_for('shop_proflie')}}">Profile</a></li>
           {% elif session.role == 6 %}
           <li><a class="nav-link scrollto active" href="{{url_for('mechanicProfile')}}">Profile</a></li>

@@ -54,7 +54,7 @@ def requestMechanics():
 @app.route("/logout",methods=['GET'])
 def logout():
     session.clear()
-    return redirect('/user-login')
+    return redirect('/')
 
 @app.route('/view-mechanics', methods=['GET','POST'])
 def viewMechanical():
@@ -471,7 +471,7 @@ def getShopNearestRequests():
                     sin(radians(user_latitude))
                 )
             ) AS distance
-        FROM requests WHERE status = 0
+        FROM requests WHERE status NOT IN (1,2)
         ORDER BY distance;
 
         """
@@ -566,7 +566,7 @@ def assignMechanic():
         req_id = data['request_id']
         query = text(
             """
-        UPDATE requests SET mid = :mid WHERE request_id = :req_id 
+        UPDATE requests SET mid = :mid, status = 1 WHERE request_id = :req_id 
         """
         )
         db.session.execute(query,{"req_id":req_id,"mid":mid})
