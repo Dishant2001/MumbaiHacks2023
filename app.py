@@ -1,5 +1,4 @@
 from flask import Flask, render_template, redirect, session, request, jsonify
-
 import json
 from dotenv.main import load_dotenv
 from flask_session import Session
@@ -15,7 +14,6 @@ from datetime import datetime, timedelta
 from utility import *
 
 app = Flask(__name__)
-
 CORS(app, resources={r"/*": {"origins": "*"}})
 # CORS(app)
 load_dotenv()
