@@ -42,7 +42,7 @@
       <!-- Uncomment below if you prefer to use an image logo -->
       <!-- <a href="index.html" class="logo me-auto"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
 
-      <nav id="navbar" class="navbar"  >
+      <nav id="navbar" class="navbar">
         <ul>
           <li><a class="nav-link scrollto active" href="#hero">Home</a></li>
           <li><a class="nav-link scrollto" href="#about">About</a></li>
@@ -66,8 +66,13 @@
           </li> -->
           <li><a class="nav-link scrollto" href="#contact">Contact</a></li>
 
-          <li><a class="getstarted scrollto" href="{{ url_for('authentication') }} " id="get-started">Get Started</a></li>
-          
+          {% if session %}
+          <li><a class="getstarted scrollto" href="{{ url_for('logout') }} " id="get-started">Logout</a>
+            {% else %}
+            <li><a class="getstarted scrollto" href="{{ url_for('authentication') }} " id="get-started">Get Started</a>
+          {% endif %}
+          </li>
+
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->
@@ -85,7 +90,13 @@
           <h1>Revolutionizing Mechanical Services</h1>
           <h2>Efficient and Reliable Mechanical Service for Seamless Operation</h2>
           <div class="d-flex justify-content-center justify-content-lg-start">
-            <a href="{{ url_for('authentication') }}" class="btn-get-started scrollto">Get Started</a>
+            {% if session.role == 4 %}
+            <a class="btn-get-started scrollto" href="{{url_for('customer_profile')}}">Get Started</a>
+            {% elif session.role == 5 %}
+            <a class="btn-get-started scrollto" href="{{url_for('shop_proflie')}}">Get Started</a>
+            {% elif session.role == 6 %}
+            <a class="btn-get-started scrollto" href="{{url_for('mechanicProfile')}}">Get Started</a>
+            {% endif %}
           </div>
         </div>
         <div class="col-lg-6 order-1 order-lg-2 hero-img" data-aos="zoom-in" data-aos-delay="200">
@@ -539,14 +550,6 @@
       class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
-  <script>
-    document.getElementById("get-started").innerText = "Logout";
-
-document.getElementById("get-started").addEventListener("click",async ()=>{
-  const response = await fetch("/logout");
-  const data = await response.json();
-})
-  </script>
   <script src="../../static/assets/vendor/aos/aos.js"></script>
   <script src="../../static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="../../static/assets/vendor/glightbox/js/glightbox.min.js"></script>

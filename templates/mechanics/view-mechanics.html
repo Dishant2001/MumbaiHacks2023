@@ -54,10 +54,10 @@
 async function getMechanics(){
   const response = await fetch('/getMechanics');
   const data = await response.json();
+  var container = document.getElementById("mechanic-cont");
   data.mechanics.forEach(mech => {
 
-    var container = document.createElement("div");
-    container.innerHTML = `
+    container.innerHTML += ( `
     <div class="col col-md-4 col-lg-4 col-xl-4" >
         <div class="card" style="border-radius: 15px;">
           <div class="card-body p-4">
@@ -93,9 +93,8 @@ async function getMechanics(){
           </div>
         </div>
       </div>
-    `;
+    `);
 
-    document.getElementById("mechanic-cont").appendChild(container);
     
   });
 }
@@ -119,12 +118,6 @@ document.addEventListener("click", async function(event) {
 
 getMechanics();
 
-document.getElementById("get-started").innerText = "Logout";
-
-document.getElementById("get-started").addEventListener("click",async ()=>{
-  const response = await fetch("/logout");
-  const data = await response.json();
-})
 
 
 </script>

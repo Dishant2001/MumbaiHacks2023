@@ -371,7 +371,8 @@ def getNearestRequest():
         data = request.get_json()
         mech_lat = data['latitude']
         mech_long = data['longitude']
-        query = """
+        query = text(
+            """
         SELECT *, 
             (
                 6371 * 
@@ -387,6 +388,7 @@ def getNearestRequest():
         ORDER BY distance;
 
         """
+        )
         results = db.session.execute(query,{
             "given_latitude":mech_lat,
             "given_longitude":mech_long,
@@ -419,9 +421,11 @@ def acceptRequest():
         req_id = data['request_id']
         mech_lat = data['latitude']
         mech_long = data['longitude']
-        query = """
+        query = text(
+            """
         UPDATE requests SET status = 1, mech_latitude = :mech_lat, mech_longitude = :mech_long, mid = :mid WHERE request_id = :req_id;
         """
+        )
 
         db.session.execute(query,{
             "mech_lat":mech_lat,
@@ -443,9 +447,11 @@ def getShopNearestRequests():
         # data = request.get_json()
         # mech_lat = data['latitude']
         # mech_long = data['longitude']
-        query = """
+        query = text(
+            """
         SELECT address FROM users WHERE uid = :uid
         """
+        )
         result = db.session.execute(query,{"uid":session.get("uid")}).fetchone()
         lat = ''
         long = ''
@@ -454,7 +460,8 @@ def getShopNearestRequests():
             lat = float(address.split('+')[0])
             long = float(address.split('+')[1])
 
-        query2 = """
+        query2 = text(
+            """
         SELECT *, 
             (
                 6371 * 
@@ -470,6 +477,7 @@ def getShopNearestRequests():
         ORDER BY distance;
 
         """
+        )
         results = db.session.execute(query2,{
             "given_latitude":lat,
             "given_longitude":long,
@@ -501,9 +509,11 @@ def getRequests():
         # data = request.get_json()
         # mech_lat = data['latitude']
         # mech_long = data['longitude']
-        query = """
+        query = text(
+            """
         SELECT * FROM requests WHERE mid = :mid
         """
+        )
         results = db.session.execute(query,{"mid":session.get("uid")})
 
         
@@ -526,9 +536,11 @@ def getUserRequests():
         # data = request.get_json()
         # mech_lat = data['latitude']
         # mech_long = data['longitude']
-        query = """
+        query = text(
+            """
         SELECT * FROM requests WHERE uid = :uid
         """
+        )
         results = db.session.execute(query,{"uid":session.get("uid")})
 
         
@@ -553,9 +565,11 @@ def assignMechanic():
         data = request.get_json()
         mid = data['mid']
         req_id = data['request_id']
-        query = """
+        query = text(
+            """
         UPDATE requests SET mid = :mid WHERE request_id = :req_id 
         """
+        )
         db.session.execute(query,{"req_id":req_id,"mid":mid})
         db.session.commit()
         return json.dumps({"mssg":200})
@@ -566,9 +580,11 @@ def getMechanics():
     print('Entered outside')
     if request.method=='GET' and session.get('uid') is not None and session.get("role") in ['5',5]:
         print("Entered inside")
-        query = """
+        query = text(
+            """
         SELECT * from mechanics WHERE shop_id=:shop_id 
         """
+        )
         results = db.session.execute(query,{"shop_id":session.get("uid")})
         mech_list = []
         for req in results:
@@ -584,9 +600,11 @@ def getMechanics():
 @app.route('/assignedRequests',methods=['GET',"POST"])
 def assignedRequests():
     if request.method=="GET" and session.get("uid") is not None and session.get("role") in [6,'6']:
-        query = """
+        query = text(
+            """
         SELECT * from requests WHERE mid=:mid AND mech_latitude IS NULL
         """
+        )
         results = db.session.execute(query,{"mid":session.get("uid")})
         
         req_list = []
@@ -613,9 +631,11 @@ def assignedRequests():
 @app.route('/getMechLocation/<id>',methods=['GET','POST'])
 def getMechLocation(id):
     if request.method=="GET" and session.get("uid") is not None and session.get("role") in [4,'4']:
-        query = """
+        query = text(
+            """
         SELECT * from requests WHERE request_id = :req_id
         """
+        )
         results = db.session.execute(query,{"req_id":id}).fetchone()
         if results:
             latitude = results.mech_latitude
@@ -625,9 +645,12 @@ def getMechLocation(id):
 @app.route('/myRequest',methods=['GET','POST'])
 def myRequest():
     if request.method=="GET" and session.get("uid") is not None and session.get("role") in [4,'4']:
-        query = """
+        query = text(
+            """
         SELECT * from requests WHERE request_id = :req_id
         """
+        )
+        
         results = db.session.execute(query,{"req_id":session.get("request_id")}).fetchone()
         print(results)
         if results:
@@ -645,9 +668,11 @@ def updateloc():
         mech_long = data['longitude']
         req_id = session.get("request_id")
         print(req_id)
-        query = """
+        query = text(
+            """
         UPDATE requests SET mech_latitude = :mech_lat, mech_longitude = :mech_long WHERE request_id = :req_id
         """
+        )
         db.session.execute(query,{"req_id":req_id,"mech_lat":mech_lat,"mech_long":mech_long})
         db.session.commit()
         if session.get("status") is None:
@@ -659,9 +684,11 @@ def completeRequest():
     if request.method=="POST" and session.get("uid") is not None and session.get("role") in ['6',6]:
         mid = session.get('uid')
         req_id = session.get("request_id")
-        query = """
+        query = text(
+            """
         UPDATE requests SET status = 2 WHERE request_id = :req_id;
         """
+        )
 
         db.session.execute(query,{
             "req_id":req_id

@@ -225,13 +225,6 @@ async function getRequests(){
 
 getRequests();
 
-document.getElementById("get-started").innerText = "Logout";
-
-document.getElementById("get-started").addEventListener("click",async ()=>{
-  const response = await fetch("/logout");
-  const data = await response.json();
-})
-
 </script>
 
 {% endblock content %}
