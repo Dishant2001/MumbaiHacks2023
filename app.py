@@ -658,7 +658,7 @@ def updateloc():
 def completeRequest():
     if request.method=="POST" and session.get("uid") is not None and session.get("role") in ['6',6]:
         mid = session.get('uid')
-        req_id = session.get("req_id")
+        req_id = session.get("request_id")
         query = """
         UPDATE requests SET status = 2 WHERE request_id = :req_id;
         """
@@ -669,7 +669,7 @@ def completeRequest():
 
         db.session.commit()
 
-        session.pop("req_id")
+        session.pop("request_id")
         session.pop("status")
 
         return json.dumps({"mssg":200})
