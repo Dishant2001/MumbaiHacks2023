@@ -8,7 +8,7 @@
     <div id="map" style="height:60vh;width: 100%;"></div>
     <div class="d-flex justify-content-center">
       <a class="btn btn-primary my-3 me-3" id="redirect" href="https://www.google.com/maps/dir/19.104,72.8758094/19.1093463,72.8858094/" target="_blank" >Find the Possible Routes</a>
-      <a class="btn btn-warning my-3" id="complete-task" href="" target="_blank" id="complete-task">Complete Task</a>
+      <a class="btn btn-warning my-3" id="complete-task">Complete Task</a>
     </div>
   </div>
 </main>
@@ -17,9 +17,10 @@
 
   document.getElementById("complete-task").addEventListener("click",async()=>{
     const response = await fetch("/completeRequest",{
-      method:"POST"
+      method:"POST",
+      contentType: 'application/json',
     });
-    const data = response.json();
+    const data = await response.json();
     window.location.href = "/mechanics-profile";
   });
 

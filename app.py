@@ -526,6 +526,7 @@ def getRequests():
             d["car_name"] = req.car_name
             d["request_id"] = req.request_id
             d["timestamp"] = req.timestamp_.strftime("%Y-%m-%d %H:%M:%S")
+            d["status"] = req.status
             req_list.append(d)
 
         return json.dumps({"messg":200,"requests":req_list})
